@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ERG</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            margin: 0;
+            padding: 20px;
+            direction: rti;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #1f2833;
+            padding-bottom: 15px;
+        }
+        h1 {
+            color: #00ecff;
+            margin: 0;
+            font-size: 22px;
+        }
+        p {
+            color: #a4b0be;
+            font-size: 13px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+        .card {
+            background-color: #1f2833;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .monitor-container {
+            background-color: #03060c;
+            border: 2px solid #00ecff;
+            border-radius: 6px;
+            position: relative;
+            height: 240px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: background-color 0.1s ease-out;
+        }
+        .monitor-container.flash-active {
+            background-color: #ffffff; /* افکت فلاش تحریک نوری */
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .label-overlay {
+            position: absolute;
+            font-family: monospace;
+            font-size: 11px;
+            color: #00ecff;
+            z-index: 5;
+            pointer-events: none;
+            text-shadow: 0 0 3px rgba(0, 236, 255, 0.5);
+        }
+        .stimulus-panel {
+            background-color: #151b24;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #0b0c10;
+            color: #00ecff;
+            border: 1px solid #00ecff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #00ecff;
+            color: #0b0c10;
+        }
+        button.active {
+            background-color: #00ecff;
+            color: #0b0c10;
+        }
+        .info-section {
+            background-color: #1f2833;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .theory-box {
+            background-color: #151b24;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid #00ecff;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .wave-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #151b24;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ERG</h1>
+        <p>الکترورتینوگرام<p>
+    </header>
+
+    <div class="grid">
+        <!-- ستون مانیتور پایشگر زنده -->
+        <div class="card">
+            <h3 style="margin-top:0; color:#00ecff; font-size:15px; margin-bottom:12px;">پایشگر پاسخ الکتریکی شبکیه (Retinal Electroretinogram)</h3>
+            
+            <div class="monitor-container" id="monitorBox" onclick="unlockAudioContext()">
+                <canvas id="eegCanvas"></canvas>
+                <!-- برچسب‌ها بر اساس فرآیند زمانی اسلاید ۳۱ -->
+                <div class="label-overlay" style="top: 15px; left: 15px;">زمان تحریک نوری (Light ON) ➔ t=0</div>
+                <div class="label-overlay" style="bottom: 15px; right: 15px; color:#a4b0be; font-size:10px;">بازه زمانی ثبت: ۲ ثانیه (0.0s to 2.0s)</div>
+            </div>
+
+            <!-- بخش کنترل پویای فلاش تحریک نوری -->
+            <div class="stimulus-panel">
+                <button id="btnStimulate" onclick="triggerLightFlash()">تحریک نوری شبکیه 💡 (Flash Stimulus)</button>
+                
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label for="retinaState" style="font-size:12px; color:#a4b0be;">وضعیت گیرنده‌های نوری:</label>
+                    <select id="retinaState" onchange="updateRetinaState()" style="padding:8px; background-color:#0b0c10; color:#fff; border:1px solid #00ecff; border-radius:4px; font-family:inherit;">
+                        <option value="normal">سالم و طبیعی (Healthy)</option>
+                        <option value="damaged">آسیب‌دیده / دژنره (Degenerated)</option>
+                    </select>
+                </div>
+                
+                <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()" style="border-color:#747d8c; color:#fff;">بوق صوتی 🔈</button>
+            </div>
+        </div>
+
+        <!-- ستون تعاریف و اطلاعات کاربردی منطبق بر جزوه -->
+        <div class="info-section">
+            <h3 style="margin-top:0; color:#00ecff; font-size:15px; margin-bottom:12px;">مبانی ثبت و فیزیولوژی شبکیه </h3>
+            
+            <div class="theory-box">
+                <strong>مکانیزم ثبت با الکترود تماسی:</strong><br>
+                برای ثبت ERG، لنزهای تماسی روی چشم قرار می‌گیرد و با استفاده از الکترود مرجع، اختلاف پتانسیل ثبت می‌شود. الکترودهای تماسی معمولاً از جنس <strong>نقره/کلرید نقره (Ag/AgCl)</strong> هستند.
+            </div>
+
+            <div class="theory-box" style="border-right-color: #ffd32a;">
+                <strong>تحریک نوری کوتاه :</strong><br>
+                برای ثبت ERG، یک تحریک نوری در یک بازه کوتاه به چشم وارد می‌شود و ثبت پتانسیل صورت می‌گیرد.
+            </div>
+
+            <div class="theory-box" style="border-right-color: #ff4757;">
+                <strong>تشخیص سلامت گیرنده‌های نوری:</strong><br>
+                ثبت سیگنال نهایی ERG مستقیماً برای <strong>تشخیص سلامت گیرنده‌های نوری</strong> (مخروطی و استوانه‌ای) استفاده می‌شود.
+            </div>
+
+            <h4 style="margin: 15px 0 8px 0; color:#00ecff; font-size:13px;">تفسیر امواج ثبت شده :</h4>
+            <div style="font-size:12px; line-height:1.6;">
+                <div><span class="wave-tag" style="color:#ff4757;">موج a (افت منفی اولیه):</span> بازتابی از فعالیت سلول‌های گیرنده نوری (Rods & Cones) است.</div>
+                <div><span class="wave-tag" style="color:#2ecc71;">موج b (صعود تیز مثبت):</span> نشان‌دهنده سلول‌های لایه میانی شبکیه (بوق فرکانس بالا).</div>
+                <div><span class="wave-tag" style="color:#ffd32a;">موج c (صعود ملایم ثانویه):</span> بازگوکننده سلامت سلول‌های رنگدانه شبکیه (RPE).</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('eegCanvas');
+    const ctx = canvas.getContext('2d');
+    const monitorBox = document.getElementById('monitorBox');
+    const retinaState = document.getElementById('retinaState');
+
+    let currentX = 0;
+    let lastX = 0;
+    let lastY = 120;
+    const sweepSpeed = 3;
+
+    let isStimulated = false;
+    let stimulusProgress = 0;
+    let isDamaged = false; // وضعیت سلامت گیرنده‌ها
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let audioUnlocked = false;
+
+    // ۱۰۰ نقطه پیوسته برای مدلسازی کاملا طبیعی موج ERG بر اساس نمودار اسلاید ۳۱
+    const ergTemplate = [
+        0, 0, 0, 0, 0, // خط صاف اولیه پیش از فلاش
+        -2, -5, -9, -12, -15, -12, -8, // موج a (افت عمیق منفی گیرنده‌های نوری)
+        2, 18, 38, 55, 65, 68, 65, 55, 42, 28, 18, 10, 5, 2, // موج فوق‌العاده تیز b مثبت (سلول‌های دو قطبی)
+        1, 1, 2, 3, 5, 8, 11, 13, 15, 16, 17, 18, 17, 15, 13, 10, 8, 6, 4, 2, 1, 0, // موج بسیار ملایم و طولانی c (سلول‌های RPE)
+        0, 0, 0, 0, 1, 3, 5, 6, 5, 3, 1, 0, // موج ثانویه d (پاسخ خاموشی زمان قطع فلاش)
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // بازگشت پایدار به خط مبدا
+    ];
+
+    function initCanvasSize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        ctx.fillStyle = '#03060c';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        lastY = canvas.height / 2;
+    }
+    window.addEventListener('resize', initCanvasSize);
+    initCanvasSize();
+
+    function unlockAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        audioUnlocked = true;
+    }
+
+    function toggleAudio() {
+        unlockAudioContext();
+        audioEnabled = !audioEnabled;
+        const btn = document.getElementById('btnAudio');
+        if (audioEnabled) {
+            btn.classList.remove('muted');
+            btn.innerText = 'بوق صوتی 🔊';
+        } else {
+            btn.classList.add('muted');
+            btn.innerText = 'بوق صوتی 🔈';
+        }
+    }
+
+    // پخش صدای پیزو-الکتریک شبیه‌ساز شارژ فلاش نوری و تخلیه ناگهانی صوتی در ثبت
+    function playFlashSound() {
+        if (!audioEnabled || !audioUnlocked || !audioCtx) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            // افکت شارژ خازنی فلاش نوری (فرکانس صعودی بسیار سریع)
+            osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.12);
+
+            gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.14);
+
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e) {
+            console.log("صداگذاری مخدوش شد: ", e);
+        }
+    }
+
+    function updateRetinaState() {
+        isDamaged = retinaState.value === 'damaged';
+    }
+
+    // شبیه‌سازی زدن فلاش نوری کوتاه مدت (Light ON - اسلاید ۳۲)
+    function triggerLightFlash() {
+        unlockAudioContext();
+        
+        // ۱. فعال کردن افکت فیزیکی فلاش (سفید شدن مانیتور برای چند میلی ثانیه)
+        monitorBox.classList.add('flash-active');
+        playFlashSound();
+
+        setTimeout(() => {
+            monitorBox.classList.remove('flash-active');
+            
+            // ۲. راه‌اندازی فرآیند ثبت و ترسیم پالس بیوالکتریک ERG
+            currentX = 0;
+            lastX = 0;
+            isStimulated = true;
+            stimulusProgress = 0;
+        }, 120);
+    }
+
+    // شبیه‌سازی دقیق و پویا ریاضی امواج ERG
+    function getERGValue() {
+        if (!isStimulated) return 0;
+
+        let index = Math.floor((stimulusProgress / 80) * ergTemplate.length);
+        index = Math.max(0, Math.min(index, ergTemplate.length - 1));
+
+        let val = ergTemplate[index] * 2.2; // بزرگنمایی مقیاسی موج
+
+        // اعمال تضعیف پتانسیل در صورت خرابی گیرنده‌های نوری (اسلاید ۳۲)
+        if (isDamaged) {
+            val = val * 0.12; // ۸۸٪ افت پتانسیل در تخریب شبکیه
+        }
+
+        stimulusProgress++;
+        if (stimulusProgress >= 80) {
+            isStimulated = false;
+        }
+
+        return val;
+    }
+
+    // چرخه انیمیشن اسکن مانیتور
+    function tick() {
+        currentX += sweepSpeed;
+        if (currentX >= canvas.width) {
+            currentX = 0;
+            lastX = 0;
+        }
+
+        // رسم پاک کننده
+        ctx.fillStyle = '#03060c';
+        ctx.fillRect(currentX + 2, 0, 15, canvas.height);
+
+        // دنباله تدریجی تیره فسفری موج
+        ctx.fillStyle = 'rgba(3, 6, 12, 0.012)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const ergVal = getERGValue();
+        let targetY = (canvas.height / 2) - ergVal;
+
+        // رسم پالس شبکیه با تم فیروزه‌ای نئونی چشم
+        ctx.strokeStyle = '#00ecff';
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = '#00ecff';
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, targetY);
+        } else {
+            ctx.moveTo(currentX, targetY);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        lastX = currentX;
+        lastY = targetY;
+
+        requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>

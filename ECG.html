@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> ECG</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0e14;
+            color: #f1f2f6;
+            margin: 0;
+            padding: 20px;
+            direction: rti;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #222733;
+            padding-bottom: 15px;
+        }
+        h1 {
+            color: #2ecc71;
+            margin: 0;
+            font-size: 22px;
+        }
+        p {
+            color: #a4b0be;
+            font-size: 13px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1.6fr 1fr;
+            }
+        }
+        .card {
+            background-color: #151922;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .monitor-container {
+            background-color: #030805;
+            background-image: 
+                linear-gradient(rgba(231, 76, 60, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(231, 76, 60, 0.07) 1px, transparent 1px),
+                linear-gradient(rgba(231, 76, 60, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(231, 76, 60, 0.2) 1px, transparent 1px);
+            background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+            border: 2px solid #27ae60;
+            border-radius: 6px;
+            position: relative;
+            height: 250px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .monitor-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-family: monospace;
+            text-align: left;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .hr-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2ecc71;
+            line-height: 1;
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+        }
+        .hr-label {
+            font-size: 10px;
+            color: #88af93;
+            letter-spacing: 1px;
+        }
+        .status-display {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2ecc71;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+            z-index: 10;
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+        }
+        .heart-icon {
+            display: inline-block;
+            transition: transform 0.05s ease-out;
+            transform: scale(1);
+        }
+        .heart-icon.pulse {
+            transform: scale(1.4);
+            color: #e74c3c;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #222733;
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #2d3446;
+        }
+        button.active {
+            background-color: #2ecc71;
+            color: #11141a;
+            font-weight: bold;
+        }
+        .audio-btn {
+            background-color: #e74c3c;
+            font-weight: bold;
+        }
+        .audio-btn.muted {
+            background-color: #747d8c;
+        }
+        .calculator-section {
+            background-color: #151922;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #f1f2f6;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 9px;
+            box-sizing: border-box;
+            background-color: #222733;
+            border: 1px solid #3d465c;
+            border-radius: 4px;
+            color: #fff;
+            font-family: inherit;
+        }
+        .result-box {
+            background-color: #222733;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid #2ecc71;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .info-panel {
+            background-color: #222733;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1> ECG</h1>
+        <p>الکتروکاردیوگرام</p>
+    </header>
+
+    <div class="grid">
+        <!-- ستون پایشگر زنده -->
+        <div class="card">
+            <h3 style="margin-top:0; color:#2ecc71; font-size:15px; margin-bottom:12px;">پایش بلادرنگ (ضربان‌ساز و مانیتور علائم حیاتی)</h3>
+            
+            <div class="monitor-container" onclick="unlockAudioContext()">
+                <canvas id="ecgCanvas"></canvas>
+                
+                <!-- لایه متنی مانیتور -->
+                <div class="monitor-overlay">
+                    <div class="hr-label">ECG HR (BPM)</div>
+                    <div class="hr-display" id="liveHrDisplay">75</div>
+                </div>
+                
+                <div class="status-display">
+                    <span id="heartIcon" class="heart-icon">❤️</span>
+                    <span id="statusText">ریتم نرمال</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="btnNormal" class="active" onclick="setHeartrate('normal')">ریتم نرمال (Normal)</button>
+                <button id="btnFast" onclick="setHeartrate('fast')">ضربان سریع (Fast)</button>
+                <button id="btnSlow" onclick="setHeartrate('slow')">ضربان کند (Slow)</button>
+                <button id="btnIrregular" onclick="setHeartrate('irregular')">آریتمی قلبی (Irregular)</button>
+                <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()">فعال‌سازی بوق صوتی 🔈</button>
+            </div>
+
+            <div class="info-panel">
+                <strong>مشخصات فیزیکی ثبت (مطابق اسلاید ۶):</strong>
+                <p style="margin: 5px 0 0 0;">
+                    • کاغذ شطرنجی با سرعت استاندارد <strong>۲۵ میلی‌متر بر ثانیه</strong> عبور می‌کند.<br>
+                    • هر مربع بزرگ (۵ خانه کوچک) معادل زمان <strong>۰.۲ ثانیه</strong> است.<br>
+                    • هر مربع کوچک معادل زمان <strong>۰.۰۴ ثانیه</strong> است.
+                </p>
+            </div>
+        </div>
+
+        <!-- ستون محاسبات کاربردی -->
+        <div class="calculator-section">
+            <h3 style="margin-top:0; color:#e67e22; font-size:15px;">۱. محاسبه‌گر ضربان قلب از کاغذ شطرنجی</h3>
+            
+            <div class="form-group">
+                <label for="calcType">مبنای محاسبه بر اساس چه فواصلی باشد؟</label>
+                <select id="calcType" onchange="calculateBPM()">
+                    <option value="large">مربع‌های بزرگ بین دو موج R (فرمول ۳۰۰)</option>
+                    <option value="small">مربع‌های کوچک بین دو موج R (فرمول ۱۵۰۰)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="squareCount">تعداد خانه‌ها (مربع‌ها) مابین دو موج R متوالی:</label>
+                <input type="number" id="squareCount" value="4" min="0.5" step="0.1" oninput="calculateBPM()">
+            </div>
+
+            <div class="result-box" id="bpmResult">
+                ضربان قلب: <strong>۷۵ بار در دقیقه</strong>
+            </div>
+
+            <hr style="border-color: #222733; margin: 20px 0;">
+
+            <h3 style="color:#e67e22; font-size:15px;">۲. بررسی انحراف محور قلب (قانون اینتهوون)</h3>
+            
+            <div class="form-group">
+                <label for="leadI">ولتاژ لید I (به میلی‌متر):</label>
+                <input type="number" id="leadI" value="5" oninput="calculateVector()">
+            </div>
+
+            <div class="form-group">
+                <label for="leadIII">ولتاژ لید III (به میلی‌متر):</label>
+                <input type="number" id="leadIII" value="10" oninput="calculateVector()">
+            </div>
+
+            <div class="result-box" id="vectorResult">
+                لید II طبق قانون اینتهوون: <strong>۱۵ میلی‌متر</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('ecgCanvas');
+    const ctx = canvas.getContext('2d');
+    const liveHrDisplay = document.getElementById('liveHrDisplay');
+    const heartIcon = document.getElementById('heartIcon');
+    const statusText = document.getElementById('statusText');
+
+    let currentX = 0;
+    let currentY = 0;
+    let lastX = 0;
+    let lastY = 0;
+    const sweepSpeed = 2.5; // سرعت حرکت افقی موج
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let audioUnlocked = false;
+
+    let heartbeatMode = 'normal';
+    let beatInterval = 800; // بازه زمانی پیش‌فرض ریتم نرمال
+    let lastBeatTime = 0;
+
+    let waveProgress = 0;
+    let isBeating = false;
+    const waveDuration = 60; // فریم‌های یک تپش کامل
+
+    // دیتای باکیفیت و پیوسته شکل موج قلبی (طراحی آناتومیک منطبق بر اسلاید ۷)
+    // طول آرایه ۱۰۰ خانه است که تناسبات بخش‌های P-Q-R-S-T را به شکل واقعی شبیه‌سازی می‌کند
+    const ecgTemplate = [
+        0, 0, 0, 0, 0, 0, 0, // خط صاف پایه (TP segment)
+        0.5, 1.2, 1.8, 2.0, 1.8, 1.2, 0.5, 0, // موج پی (P wave)
+        0, 0, 0, 0, 0, // خط بازگشتی PR segment
+        -1.5, -3.0, // افت Q
+        10, 25, 45, 60, 42, 15, -12, -22, -14, -5, // کمپلکس پرقدرت QRS
+        0, 0, 0, 0, 0, // خط صاف ST segment
+        0.8, 1.8, 2.8, 3.8, 4.2, 3.8, 2.8, 1.8, 0.8, // موج بلند و نرم T
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // امتداد خط صاف نهایی
+    ];
+
+    function initCanvasSize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        ctx.fillStyle = '#030805';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        currentY = canvas.height / 2;
+        lastY = canvas.height / 2;
+    }
+    window.addEventListener('resize', initCanvasSize);
+    initCanvasSize();
+
+    // خنثی کردن قفل صوتی مرورگر با کلیک اول کاربر بر روی مانیتور یا هر دکمه
+    function unlockAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        audioUnlocked = true;
+    }
+
+    function toggleAudio() {
+        unlockAudioContext();
+        audioEnabled = !audioEnabled;
+        const btn = document.getElementById('btnAudio');
+        if (audioEnabled) {
+            btn.classList.remove('muted');
+            btn.innerText = 'قطع بوق صوتی 🔊';
+            playBeep(); // بوق تست فوری برای بازخورد صوتی سریع به کاربر
+        } else {
+            btn.classList.add('muted');
+            btn.innerText = 'فعال‌سازی بوق صوتی 🔈';
+        }
+    }
+
+    // تولید صدای بوق دقیق و بدون ترق‌تروق (به کمک پوش فرکانس)
+    function playBeep() {
+        if (!audioEnabled || !audioUnlocked || !audioCtx) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(850, audioCtx.currentTime); // ۸۵۰ هرتز بوق مانیتورینگ بیمار
+            
+            gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            // شروع سریع بدون نویز پاپ
+            gainNode.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.01);
+            // فرود نمایی و بی‌صدا شدن آرام صوتی
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.09);
+        } catch(e) {
+            console.warn("تداخل در صوتی صادر شد: ", e);
+        }
+    }
+
+    function setHeartrate(mode) {
+        unlockAudioContext();
+        heartbeatMode = mode;
+        document.querySelectorAll('.controls button').forEach(b => {
+            if (b.id !== 'btnAudio') b.classList.remove('active');
+        });
+
+        if (mode === 'normal') {
+            document.getElementById('btnNormal').classList.add('active');
+            beatInterval = 800; // بازه معادل ۷۵ ضربان
+            liveHrDisplay.style.color = '#2ecc71';
+            statusText.style.color = '#2ecc71';
+            statusText.innerText = "ریتم نرمال";
+            liveHrDisplay.innerText = "75";
+        } else if (mode === 'fast') {
+            document.getElementById('btnFast').classList.add('active');
+            beatInterval = 460; // بازه معادل ۱۳۰ ضربان
+            liveHrDisplay.style.color = '#e74c3c';
+            statusText.style.color = '#e74c3c';
+            statusText.innerText = "تاکی‌کاردی (سریع)";
+            liveHrDisplay.innerText = "130";
+        } else if (mode === 'slow') {
+            document.getElementById('btnSlow').classList.add('active');
+            beatInterval = 1350; // بازه معادل ۴۴ ضربان
+            liveHrDisplay.style.color = '#3498db';
+            statusText.style.color = '#3498db';
+            statusText.innerText = "برادی‌کاردی (کند)";
+            liveHrDisplay.innerText = "44";
+        } else if (mode === 'irregular') {
+            document.getElementById('btnIrregular').classList.add('active');
+            beatInterval = 750;
+            liveHrDisplay.style.color = '#f39c12';
+            statusText.style.color = '#f39c12';
+            statusText.innerText = "آریتمی قلبی ⚠️";
+        }
+    }
+
+    // استخراج ارزش عددی پیوسته بر اساس دیتای آرایه ضربان
+    function getECGValue() {
+        if (!isBeating) return 0;
+
+        // نگاشت زمان گام جاری تپش به طول آرایه ۱۰۰ تایی داده الگو
+        let index = Math.floor((waveProgress / waveDuration) * ecgTemplate.length);
+        index = Math.max(0, Math.min(index, ecgTemplate.length - 1));
+
+        let val = ecgTemplate[index] * 2.2; // ضریب بزرگنمایی عمودی برای وضوح مانیتور
+
+        // شلیک بوق در قله تیز موج R (حول اندیس ۲۸ الگو)
+        if (index === 28 && !audioPlayedThisBeat) {
+            playBeep();
+            triggerVisualPulse();
+            audioPlayedThisBeat = true;
+        }
+
+        waveProgress++;
+        if (waveProgress >= waveDuration) {
+            isBeating = false;
+        }
+
+        return val;
+    }
+
+    let audioPlayedThisBeat = false;
+
+    function triggerVisualPulse() {
+        heartIcon.classList.add('pulse');
+        setTimeout(() => {
+            heartIcon.classList.remove('pulse');
+        }, 85);
+    }
+
+    // حلقه رندر اصلی با سیستم اسکن فسفری و پاک‌کننده بلادرنگ
+    function tick(timestamp) {
+        let interval = beatInterval;
+        if (heartbeatMode === 'irregular') {
+            // شبیه‌سازی آریتمی قلبی (اسلاید ۸) به کمک توابع نوسانی تصادفی
+            let shift = Math.sin(timestamp / 350) * 160 + Math.cos(timestamp / 130) * 60;
+            interval = beatInterval + shift;
+            
+            let dynamicBpm = Math.round(1500 / (interval / 4));
+            if (dynamicBpm > 42 && dynamicBpm < 160) {
+                liveHrDisplay.innerText = dynamicBpm;
+            }
+        }
+
+        if (timestamp - lastBeatTime > interval) {
+            lastBeatTime = timestamp;
+            isBeating = true;
+            waveProgress = 0;
+            audioPlayedThisBeat = false;
+        }
+
+        // حرکت افقی مکان‌نما
+        currentX += sweepSpeed;
+
+        // اگر خط به انتهای سمت راست مانیتور برسد، به ابتدا برمی‌گردد
+        if (currentX >= canvas.width) {
+            currentX = 0;
+            lastX = 0;
+        }
+
+        // محاسبه ارتفاع عمودی سیگنال در گام جاری
+        const ecgValue = getECGValue();
+        currentY = (canvas.height / 2) - ecgValue;
+
+        // ۱. نوسان‌نمای حرفه‌ای: کشیدن یک نوار مستطیل متحرک برای پاک‌کردن اطلاعات قدیمی جلوتر از خط اسکن جاری
+        ctx.fillStyle = '#030805';
+        ctx.fillRect(currentX + 2, 0, 15, canvas.height);
+
+        // ۲. افکت محوشدگی فسفر (هر فریم کل صفحه کمی تیره می‌شود تا دنباله رسم‌شده کم‌رنگ به نظر برسد)
+        ctx.fillStyle = 'rgba(3, 8, 5, 0.012)'; // ایجاد سایه تدریجی فسفر
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // ۳. رسم خط اسکن جاری
+        ctx.strokeStyle = '#2ecc71';
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = '#2ecc71';
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        // جلوگیری از ایجاد خط پیوندی بزرگ در زمان بازگشت اسکن از انتها به ابتدا
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, currentY);
+        } else {
+            ctx.moveTo(currentX, currentY);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // ثبت مکان فعلی برای گام بعدی
+        lastX = currentX;
+        lastY = currentY;
+
+        requestAnimationFrame(tick);
+    }
+
+    // آغاز انیمیشن
+    requestAnimationFrame(tick);
+
+
+    // محاسبات بخش ۱: ضربان قلب (اسلاید ۶)
+    function calculateBPM() {
+        const type = document.getElementById('calcType').value;
+        const count = parseFloat(document.getElementById('squareCount').value);
+        const resultDiv = document.getElementById('bpmResult');
+
+        if (isNaN(count) || count <= 0) {
+            resultDiv.innerHTML = "<span style='color:#e74c3c;'>مقدار ورودی معتبر نیست.</span>";
+            return;
+        }
+
+        let bpm = 0;
+        if (type === 'large') {
+            bpm = Math.round(300 / count);
+            resultDiv.innerHTML = `ضربان قلب محاسبه شده: <strong>${bpm} بار در دقیقه</strong><br><span style='font-size:11px; color:#bdc3c7;'>بر اساس فرمول جزوه: ${count} / ۳۰۰</span>`;
+        } else {
+            bpm = Math.round(1500 / count);
+            resultDiv.innerHTML = `ضربان قلب محاسبه شده: <strong>${bpm} بار در دقیقه</strong><br><span style='font-size:11px; color:#bdc3c7;'>بر اساس فرمول جزوه: ${count} / ۱۵۰۰</span>`;
+        }
+    }
+
+
+    // محاسبات بخش ۲: قانون اینتهوون و بردار قلبی (اسلایدهای ۱۱، ۱۲ و ۱۹)
+    function calculateVector() {
+        const leadI = parseFloat(document.getElementById('leadI').value);
+        const leadIII = parseFloat(document.getElementById('leadIII').value);
+        const resultDiv = document.getElementById('vectorResult');
+
+        if (isNaN(leadI) || isNaN(leadIII)) {
+            resultDiv.innerHTML = "<span style='color:#e74c3c;'>ورودی لیدها ناقص است.</span>";
+            return;
+        }
+
+        // قانون اینتهوون: II = I + III
+        const leadII = leadI + leadIII;
+
+        // محاسبه هندسی زاویه بردار قلبی M
+        let angle = Math.round(Math.atan2(leadIII - leadI/2, leadI * 0.866) * (180 / Math.PI));
+
+        // ارزیابی بر اساس محدوده زوایای اسلاید ۱۹
+        let axisText = "";
+        if (angle >= -30 && angle <= 90) {
+            axisText = "<span style='color: #2ecc71; font-weight:bold;'>محور نرمال (Normal Axis)</span>";
+        } else if (angle < -30 && angle >= -90) {
+            axisText = "<span style='color: #f1c40f; font-weight:bold;'>انحراف محور به چپ (LAD)</span>";
+        } else if (angle > 90 && angle <= 180) {
+            axisText = "<span style='color: #e67e22; font-weight:bold;'>انحراف محور به راست (RAD)</span>";
+        } else {
+            axisText = "<span style='color: #e74c3c; font-weight:bold;'>انحراف محور شدید (Extreme Deviation)</span>";
+        }
+
+        resultDiv.innerHTML = `
+            لید II طبق قانون اینتهوون: <strong>${leadII} میلی‌متر</strong> <br>
+            زاویه بردار قلب (M): <strong>${angle} درجه</strong> <br>
+            وضعیت بردار قلب: <strong>${axisText}</strong>
+        `;
+    }
+
+    // راه‌اندازی اولین دور محاسبات
+    calculateBPM();
+    calculateVector();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOG</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0c0d12;
+            color: #d1d2d6;
+            margin: 0;
+            padding: 20px;
+            direction: rti;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #1f2330;
+            padding-bottom: 15px;
+        }
+        h1 {
+            color: #ff9f43;
+            margin: 0;
+            font-size: 22px;
+        }
+        p {
+            color: #a4b0be;
+            font-size: 13px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+        .card {
+            background-color: #1b1f2b;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .monitor-container {
+            background-color: #040711;
+            border: 2px solid #ff9f43;
+            border-radius: 6px;
+            position: relative;
+            height: 240px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .channel-label {
+            position: absolute;
+            font-family: monospace;
+            font-size: 11px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .eye-tester {
+            background-color: #0e111a;
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            border: 1px solid #1f2330;
+        }
+        .eye-socket {
+            width: 90px;
+            height: 55px;
+            background-color: #ffffff;
+            border-radius: 50% / 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid #2f3542;
+            transition: all 0.15s;
+        }
+        .pupil {
+            width: 32px;
+            height: 32px;
+            background-color: #1e90ff;
+            border: 6px solid #000;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .eyelid {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1b1f2b;
+            transition: top 0.1s ease-in-out;
+            z-index: 2;
+        }
+        .eyelid.blink-active {
+            top: 0;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .controls-grid button {
+            background-color: #222736;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+        .controls-grid button:hover {
+            background-color: #2f364e;
+        }
+        .controls-grid button.active {
+            background-color: #ff9f43;
+            color: #0c0d12;
+            font-weight: bold;
+        }
+        .info-section {
+            background-color: #1b1f2b;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .theory-box {
+            background-color: #0e111a;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid #ff9f43;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .accordion-item {
+            background-color: #0e111a;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .accordion-header {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ff9f43;
+            border-bottom: 1px solid #1f2330;
+        }
+        .accordion-body {
+            padding: 12px;
+            font-size: 12.5px;
+            line-height: 1.6;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>EOG</h1>
+        <p>الکترواکولوگرام</p>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h3 style="margin-top:0; color:#ff9f43; font-size:15px; margin-bottom:12px;">پایشگر بلادرنگ سیگنال‌های EOG دوکاناله</h3>
+            
+            <div class="monitor-container" onclick="unlockAudioContext()">
+                <canvas id="eegCanvas"></canvas>
+                <div class="channel-label" style="top: 15px; left: 15px; color:#00a8ff;">کانال افقی (Horizontal EOG - چپ/راست)</div>
+                <div class="channel-label" style="top: 125px; left: 15px; color:#ffd32a;">کانال عمودی (Vertical EOG - بالا/پایین/پلک)</div>
+            </div>
+
+            <div class="eye-tester">
+                <div style="text-align:center;">
+                    <div class="eye-socket">
+                        <div class="eyelid" id="eyelid"></div>
+                        <div class="pupil" id="pupil"></div>
+                    </div>
+                    <div style="font-size:11px; margin-top:6px; color:#a4b0be;">چشم مجازی شبیه‌ساز حرکت</div>
+                </div>
+
+                <div style="flex-grow:1; max-width:180px;">
+                    <label for="angleSlider" style="font-size:12px; display:block; margin-bottom:5px;">زاویه انحراف چشم :</label>
+                    <input type="range" id="angleSlider" min="5" max="30" value="15" style="width:100%;" oninput="updateAngle()">
+                    <span id="angleValue" style="font-size:11px; color:#ff9f43; font-family:monospace;">۱۵ درجه انحراف</span>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="controls-grid">
+                    <button id="btnUp" onclick="look('up')">نگاه به بالا (Up)</button>
+                    <button id="btnCenter" class="active" onclick="look('center')">نگاه به جلو (Center)</button>
+                    <button id="btnBlink" onclick="look('blink')" style="background-color:#e74c3c; font-weight:bold;">پلک زدن (Blink)</button>
+                    
+                    <button id="btnLeft" onclick="look('left')">نگاه به چپ (Left)</button>
+                    <button id="btnRight" onclick="look('right')">نگاه به راست (Right)</button>
+                    <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()" style="grid-column: span 1;">صدا 🔈</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3 style="margin-top:0; color:#ff9f43; font-size:15px; margin-bottom:12px;">مبانی فیزیک و فیزیولوژی چشم </h3>
+            
+            <div class="theory-box">
+                <strong>ثبت مقدار صفر:</strong><br>
+                وقتی شخصی به جلو نگاه می‌کند، اختلاف پتانسیل دو الکترود، مقدار <strong>صفر</strong> را ثبت می‌کند.
+            </div>
+
+            <div class="theory-box" style="border-right-color: #ffd32a;">
+                <strong>سیگنال انحراف پتانسیل:</strong><br>
+                اگر چشم به سمت راست، چپ، بالا یا پایین حرکت کند؛ پتانسیل سمتی که چشم به آن سمت حرکت می‌کند، بیشتر از جهت مخالف می‌شود.
+            </div>
+
+            <div class="theory-box" style="border-right-color: #00a8ff;">
+                <strong>سیگنال متناسب با زاویه :</strong><br>
+                میزان پتانسیل تولیدی در جهت چرخش، مستقیماً با زاویه نگاه (مثلاً ۱۵ درجه در برابر ۳۰ درجه) نسبت مستقیم و متناسب دارد.
+            </div>
+
+            <h3 style="color:#ff9f43; font-size:15px; margin-bottom:12px;">اهداف اصلی ثبت الکترواکولوگرام </h3>
+            
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(0)">✓ تحقیقات علوم شناختی و روانشناسی</div>
+                <div class="accordion-body" id="acc0">
+                    عملکرد حرکتی چشم در وظایفی مانند توجه، حافظه، شناخت و تصمیم‌گیری مورد بررسی و ارزیابی قرار می‌گیرد.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(1)">✓ مراقبت‌های درمانی و مدیریت اختلالات</div>
+                <div class="accordion-body" id="acc1">
+                    تشخیص و مدیریت برخی از اختلالات چشمی نظیر مشکلات در تثبیت نگاه یا اختلالات حرکتی چشم با تحلیل امواج EOG انجام می‌شود.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(2)">✓ سیستم‌های رابط انسان-کامپیوتر (HCI)</div>
+                <div class="accordion-body" id="acc2">
+                    استفاده از جهت حرکات چشم به عنوان ورودی برای کنترل ابزارها، ویلچرها، کیبورد مجازی و بازی‌های کامپیوتری .
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('eegCanvas');
+    const ctx = canvas.getContext('2d');
+    const angleSlider = document.getElementById('angleSlider');
+    const angleValue = document.getElementById('angleValue');
+    const pupil = document.getElementById('pupil');
+    const eyelid = document.getElementById('eyelid');
+
+    let currentX = 0;
+    let lastX = 0;
+    let hLastY = 65;
+    let vLastY = 175;
+    const sweepSpeed = 3;
+
+    let eyeAngle = 15; 
+    let eyeDirection = 'center'; // جهت جاری چشم
+    let blinkProgress = 0;
+    let isBlinking = false;
+
+    let hVoltage = 0; // ولتاژ لید افقی
+    let vVoltage = 0; // ولتاژ لید عمودی
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let audioUnlocked = false;
+    let oscNode = null;
+    let gainNode = null;
+
+    function initCanvasSize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        ctx.fillStyle = '#040711';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        hLastY = canvas.height * 0.25;
+        vLastY = canvas.height * 0.75;
+    }
+    window.addEventListener('resize', initCanvasSize);
+    initCanvasSize();
+
+    function initEOGAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        if (!oscNode) {
+            oscNode = audioCtx.createOscillator();
+            gainNode = audioCtx.createGain();
+            
+            oscNode.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscNode.type = 'sine';
+            oscNode.frequency.setValueAtTime(400, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            oscNode.start(0);
+        }
+        audioUnlocked = true;
+    }
+
+    function unlockAudioContext() {
+        initEOGAudio();
+    }
+
+    function toggleAudio() {
+        initEOGAudio();
+        audioEnabled = !audioEnabled;
+        const btn = document.getElementById('btnAudio');
+        if (audioEnabled) {
+            btn.classList.remove('muted');
+            btn.innerText = 'قطع صدا 🔊';
+            updateAudioFeedback();
+        } else {
+            btn.classList.add('muted');
+            btn.innerText = 'صدا 🔈';
+            if (gainNode) gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        }
+    }
+
+    function updateAudioFeedback() {
+        if (!audioEnabled || !oscNode || !gainNode || !audioCtx) return;
+        
+        if (eyeDirection === 'center') {
+            gainNode.gain.linearRampToValueAtTime(0.015, audioCtx.currentTime + 0.05);
+            oscNode.frequency.linearRampToValueAtTime(400, audioCtx.currentTime + 0.05);
+        } else if (eyeDirection === 'blink') {
+            oscNode.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        } else {
+            let freq = 400 + hVoltage * 4 + vVoltage * 4;
+            gainNode.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.05);
+            oscNode.frequency.linearRampToValueAtTime(freq, audioCtx.currentTime + 0.05);
+        }
+    }
+
+    function updateAngle() {
+        eyeAngle = parseInt(angleSlider.value);
+        angleValue.innerText = `${eyeAngle} درجه انحراف`;
+        applyVoltages();
+    }
+
+    function applyVoltages() {
+        const scaleFactor = eyeAngle * 1.5; 
+
+        if (eyeDirection === 'center') {
+            hVoltage = 0;
+            vVoltage = 0;
+        } else if (eyeDirection === 'left') {
+            hVoltage = scaleFactor; // مثبت در انحراف چپ
+            vVoltage = 0;
+        } else if (eyeDirection === 'right') {
+            hVoltage = -scaleFactor; // منفی در انحراف راست
+            vVoltage = 0;
+        } else if (eyeDirection === 'up') {
+            hVoltage = 0;
+            vVoltage = scaleFactor; // مثبت در انحراف بالا
+        } else if (eyeDirection === 'down') {
+            hVoltage = 0;
+            vVoltage = -scaleFactor; // منفی در انحراف پایین
+        }
+
+        updateAudioFeedback();
+    }
+
+    function look(dir) {
+        unlockAudioContext();
+        eyeDirection = dir;
+
+        document.querySelectorAll('.controls-grid button').forEach(b => {
+            if (b.id !== 'btnAudio') b.classList.remove('active');
+        });
+
+        pupil.style.transform = "translate(0, 0)";
+        
+        if (dir === 'center') {
+            document.getElementById('btnCenter').classList.add('active');
+        } else if (dir === 'left') {
+            document.getElementById('btnLeft').classList.add('active');
+            pupil.style.transform = "translateX(-20px)";
+        } else if (dir === 'right') {
+            document.getElementById('btnRight').classList.add('active');
+            pupil.style.transform = "translateX(20px)";
+        } else if (dir === 'up') {
+            document.getElementById('btnUp').classList.add('active');
+            pupil.style.transform = "translateY(-12px)";
+        } else if (dir === 'down') {
+            document.getElementById('btnDown').classList.add('active');
+            pupil.style.transform = "translateY(12px)";
+        } else if (dir === 'blink') {
+            document.getElementById('btnBlink').classList.add('active');
+            triggerBlinkAnimation();
+        }
+
+        applyVoltages();
+    }
+
+    function triggerBlinkAnimation() {
+        eyelid.classList.add('blink-active');
+        isBlinking = true;
+        blinkProgress = 0;
+        updateAudioFeedback();
+
+        setTimeout(() => {
+            eyelid.classList.remove('blink-active');
+            look('center');
+        }, 150);
+    }
+
+    function getEOGWaves() {
+        let hVal = hVoltage;
+        let vVal = vVoltage;
+
+        // اگر پلک زدن فعال باشد، یک قله بزرگ نوک‌تیز (Transient Spike) روی کانال عمودی اعمال می‌شود (اسلاید ۲۵)
+        if (isBlinking) {
+            let t = blinkProgress / 10; // طول ۱۰ فریم
+            // معادله ریاضی تولید اسپایک بسیار سریع
+            vVal = Math.sin(t * Math.PI) * 45; 
+            blinkProgress++;
+            if (blinkProgress >= 10) {
+                isBlinking = false;
+            }
+        }
+
+        // افزودن نویز بسیار ریز طبیعی چشم (ترمور طبیعی عضلات چشم)
+        let noiseH = (Math.random() - 0.5) * 1.5;
+        let noiseV = (Math.random() - 0.5) * 1.5;
+
+        return { h: hVal + noiseH, v: vVal + noiseV };
+    }
+
+    // چرخه اسکن و رسم پایشگر EOG
+    function tick() {
+        currentX += sweepSpeed;
+        if (currentX >= canvas.width) {
+            currentX = 0;
+            lastX = 0;
+        }
+
+        // پاک کننده اسکرین
+        ctx.fillStyle = '#040711';
+        ctx.fillRect(currentX + 2, 0, 15, canvas.height);
+
+        // خط تیره فسفری پاک‌کننده
+        ctx.fillStyle = 'rgba(4, 7, 17, 0.015)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const sig = getEOGWaves();
+        const ch1Center = canvas.height * 0.25; // مرکز کانال افقی
+        const ch2Center = canvas.height * 0.75; // مرکز کانال عمودی
+
+        let hY = ch1Center - sig.h;
+        let vY = ch2Center - sig.v;
+
+        // ۱. رسم لید افقی چشم (آبی نئونی)
+        ctx.strokeStyle = '#00a8ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(lastX, hLastY);
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, hY);
+        } else {
+            ctx.moveTo(currentX, hY);
+        }
+        ctx.stroke();
+
+        // ۲. رسم لید عمودی چشم (زرد نئونی)
+        ctx.strokeStyle = '#ffd32a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(lastX, vLastY);
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, vY);
+        } else {
+            ctx.moveTo(currentX, vY);
+        }
+        ctx.stroke();
+
+        // ثبت مکان‌ها برای فریم بعد
+        lastX = currentX;
+        hLastY = hY;
+        vLastY = vY;
+
+        requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+
+    function toggleAccordion(index) {
+        const body = document.getElementById(`acc${index}`);
+        const isVisible = body.style.display === "block";
+        
+        document.querySelectorAll('.accordion-body').forEach(b => b.style.display = "none");
+
+        if (!isVisible) {
+            body.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

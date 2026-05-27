@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEG </title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0c0f16;
+            color: #f1f2f6;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #1f2736;
+            padding-bottom: 15px;
+        }
+        h1 {
+            color: #00d2d3;
+            margin: 0;
+            font-size: 22px;
+        }
+        p {
+            color: #a4b0be;
+            font-size: 13px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+        .card {
+            background-color: #161b26;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .monitor-container {
+            background-color: #02060d;
+            background-image: 
+                linear-gradient(rgba(52, 152, 219, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 152, 219, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(52, 152, 219, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 152, 219, 0.15) 1px, transparent 1px);
+            background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+            border: 2px solid #00d2d3;
+            border-radius: 6px;
+            position: relative;
+            height: 280px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .channel-label {
+            position: absolute;
+            font-family: monospace;
+            font-size: 11px;
+            color: #00d2d3;
+            z-index: 5;
+            text-shadow: 0 0 3px rgba(0, 210, 211, 0.5);
+        }
+        .controls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #222938;
+            color: #fff;
+            border: none;
+            padding: 9px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #2f384c;
+        }
+        button.active {
+            background-color: #00d2d3;
+            color: #0c0f16;
+            font-weight: bold;
+        }
+        .audio-btn {
+            background-color: #e74c3c;
+            font-weight: bold;
+        }
+        .audio-btn.muted {
+            background-color: #747d8c;
+        }
+        .lobes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .lobe-btn {
+            background-color: #1e2535;
+            border: 1px solid #2f384c;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .lobe-btn:hover {
+            border-color: #00d2d3;
+            background-color: #252e42;
+        }
+        .lobe-btn.selected {
+            background-color: #00d2d3;
+            color: #0c0f16;
+            font-weight: bold;
+            border-color: #00d2d3;
+        }
+        .calculator-section {
+            background-color: #161b26;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #f1f2f6;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 9px;
+            box-sizing: border-box;
+            background-color: #222938;
+            border: 1px solid #323d54;
+            border-radius: 4px;
+            color: #fff;
+            font-family: inherit;
+        }
+        .result-box {
+            background-color: #222938;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid #00d2d3;
+            margin-top: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>EEG</h1>
+        <p>الکتروانسفالوگرام</p>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h3 style="margin-top:0; color:#00d2d3; font-size:15px; margin-bottom:12px;">مانیتور سیگنال‌های چندکاناله الکتروانسفالوگرافی</h3>
+            
+            <div class="monitor-container" onclick="unlockAudioContext()">
+                <canvas id="eegCanvas"></canvas>
+                
+                <div class="channel-label" style="top: 20px; left: 15px;">Ch1: Fp1-A1 (پیشانی)</div>
+                <div class="channel-label" style="top: 110px; left: 15px;">Ch2: T3-A1 (گیجگاهی)</div>
+                <div class="channel-label" style="top: 200px; left: 15px;">Ch3: O1-A1 (پس‌سری)</div>
+            </div>
+            
+            <div class="controls">
+                <button id="btnDelta" onclick="setEEGState('delta')">دلتا خواب عمیق (Delta: 1-4 Hz)</button>
+                <button id="btnTheta" onclick="setEEGState('theta')">تتا نیمه‌هوشیار (Theta: 4-7 Hz)</button>
+                <button id="btnAlpha" class="active" onclick="setEEGState('alpha')">آلفا آرامش عمیق (Alpha: 8-13 Hz)</button>
+                <button id="btnBeta" onclick="setEEGState('beta')">بتا فعالیت فعال (Beta: 13-30 Hz)</button>
+                <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()">پخش صدای ریتم مغزی 🔈</button>
+            </div>
+
+            <hr style="border-color: #1f2736; margin: 15px 0;">
+            <h4 style="margin: 0 0 10px 0; color: #00d2d3; font-size: 14px;">نقشه و وظایف فیزیولوژیک لوب‌های مغز</h4>
+            <div class="lobes-grid">
+                <div class="lobe-btn" id="lobeFrontal" onclick="selectLobe('frontal')">لوب پیشانی (Frontal)</div>
+                <div class="lobe-btn" id="lobeParietal" onclick="selectLobe('parietal')">لوب آهیانه‌ای (Parietal)</div>
+                <div class="lobe-btn" id="lobeTemporal" onclick="selectLobe('temporal')">لوب گیجگاهی (Temporal)</div>
+                <div class="lobe-btn" id="lobeOccipital" onclick="selectLobe('occipital')">لوب پس‌سری (Occipital)</div>
+            </div>
+            <div class="result-box" id="lobeInfoBox" style="border-right-color: #3498db; margin-top: 10px;">
+                برای مشاهده وظایف پردازشی ، روی یکی از لوب‌های فوق کلیک کنید.
+            </div>
+        </div>
+
+        <div class="calculator-section">
+            <h3 style="margin-top:0; color:#e67e22; font-size:15px;">۱. محاسبه‌گر موقعیت الکترودها (سیستم ۲۰-۱۰)</h3>
+            <p style="font-size:12px; margin-top:-5px; color:#a4b0be;">بر اساس فواصل قوسی و مسئله مطرح‌شده در اسلاید ۷۶</p>
+            
+            <div class="form-group">
+                <label for="skullRadius">شعاع جمجمه بیمار (r به سانتی‌متر):</label>
+                <input type="number" id="skullRadius" value="10" min="1" step="0.5" oninput="calculateEEGSpacings()">
+            </div>
+
+            <div class="result-box" id="calcEegResult">
+                محیط کل جمجمه: <strong>۶۲.۸ سانتی‌متر</strong>
+            </div>
+
+            <hr style="border-color: #1f2736; margin: 20px 0;">
+
+            <h3 style="color:#e67e22; font-size:15px;">۲. خودآزمایی کنکوری ارشد (اسلاید ۷۰)</h3>
+            <div class="form-group" style="font-size:13px; line-height:1.6;">
+                <p><strong>سؤال:</strong> شکل موج زیر با بازه زمانی ۱ ثانیه مربوط به یک شخص سالم است. نام این موج و وضعیت شخص چیست؟</p>
+                <!-- تصویر گرافیکی موج آلفا مشابه اسلاید ۷۰ -->
+                <div style="background-color:#02060d; height:50px; border:1px solid #1f2736; margin-bottom:10px; position:relative;">
+                    <svg viewBox="0 0 400 50" style="width:100%; height:100%;">
+                        <path d="M 0 25 Q 10 10 20 25 T 40 25 T 60 25 T 80 25 T 100 25 T 120 25 T 140 25 T 160 25 T 180 25 T 200 25 T 220 25 T 240 25 T 260 25 T 280 25 T 300 25 T 320 25 T 340 25 T 360 25 T 380 25 T 400 25" fill="none" stroke="#00d2d3" stroke-width="1.5"/>
+                    </svg>
+                    <span style="position:absolute; bottom:2px; left:5px; font-size:9px; color:#88af93;">بازه زمانی: ۱ ثانیه (۱۰ چرخه متوالی)</span>
+                </div>
+                <select id="examAnswer" onchange="checkAnswer()">
+                    <option value="none">-- یک گزینه را انتخاب کنید --</option>
+                    <option value="wrong1">ب) دلتا، در حالت خواب عمیق</option>
+                    <option value="wrong2">ج) بتا، هوشیار و در حال فعالیت ذهنی شدید</option>
+                    <option value="correct">الف) آلفا، هوشیار و در حال استراحت (ریلکس)</option>
+                    <option value="wrong3">د) گاما، در حال حل مسئله علمی</option>
+                </select>
+            </div>
+            <div class="result-box" id="examResult" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('eegCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function initCanvasSize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', initCanvasSize);
+    initCanvasSize();
+
+    let eegState = 'alpha';
+    let sweepX = 0;
+    let lastPoints = [{x:0, y:50}, {x:0, y:140}, {x:0, y:230}];
+    const sweepSpeed = 2;
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let busterOsc = null;
+    let busterGain = null;
+
+    function unlockAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // پخش یک صدای فرکانسی مستمر و شبیه‌ساز امواج دوگوشی (باقابلیت کنترل پویا فرکانس)
+    function playEEGHum(freq) {
+        if (!audioEnabled || !audioCtx) return;
+        try {
+            if (busterOsc) {
+                busterOsc.stop();
+                busterOsc.disconnect();
+            }
+            busterOsc = audioCtx.createOscillator();
+            busterGain = audioCtx.createGain();
+            
+            busterOsc.connect(busterGain);
+            busterGain.connect(audioCtx.destination);
+            
+            busterOsc.type = 'sine';
+            busterOsc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            // پخش ملایم صدا بدون نویز ناگهانی
+            busterGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            busterGain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.5);
+
+            busterOsc.start();
+        } catch(e) {
+            console.log("صوت ریتم اجرا نشد: ", e);
+        }
+    }
+
+    function stopEEGHum() {
+        if (busterGain && audioCtx) {
+            busterGain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+            setTimeout(() => {
+                if (busterOsc) busterOsc.stop();
+            }, 250);
+        }
+    }
+
+    function toggleAudio() {
+        unlockAudioContext();
+        audioEnabled = !audioEnabled;
+        const btn = document.getElementById('btnAudio');
+        if (audioEnabled) {
+            btn.classList.remove('muted');
+            btn.innerText = 'قطع صدای ریتم مغزی 🔊';
+            updateAudioTone();
+        } else {
+            btn.classList.add('muted');
+            btn.innerText = 'پخش صدای ریتم مغزی 🔈';
+            stopEEGHum();
+        }
+    }
+
+    function updateAudioTone() {
+        if (!audioEnabled) return;
+        if (eegState === 'delta') playEEGHum(80);      // صدای بم عمیق ریتم دلتا (خواب عمیق)
+        else if (eegState === 'theta') playEEGHum(140); // صدای میانی ریتم تتا (نیمه خواب)
+        else if (eegState === 'alpha') playEEGHum(220); // صدای ملایم ریتم آلفا (آرامش)
+        else if (eegState === 'beta') playEEGHum(380);  // صدای تیز ریتم بتا (فعالیت شدید)
+    }
+
+    function setEEGState(state) {
+        unlockAudioContext();
+        eegState = state;
+        document.querySelectorAll('.controls button').forEach(b => {
+            if (b.id !== 'btnAudio') b.classList.remove('active');
+        });
+
+        if (state === 'delta') document.getElementById('btnDelta').classList.add('active');
+        else if (state === 'theta') document.getElementById('btnTheta').classList.add('active');
+        else if (state === 'alpha') document.getElementById('btnAlpha').classList.add('active');
+        else if (state === 'beta') document.getElementById('btnBeta').classList.add('active');
+
+        updateAudioTone();
+    }
+
+    // تولید ریاضی سیگنال‌های مغزی بر اساس فرکانس و فازهای نوسانی اسلاید ۴۹ و ۵۶
+    function generateEEGNoise(chanIdx, timestamp) {
+        let val = 0;
+        let t = timestamp / 1000;
+
+        if (eegState === 'delta') {
+            // ریتم دلتا (۱ تا ۴ هرتز): دامنه بسیار بزرگ و فرکانس کند
+            val = Math.sin(t * 2 * Math.PI) * 22 + Math.sin(t * 3.5 * Math.PI + chanIdx) * 8;
+        } else if (eegState === 'theta') {
+            // ریتم تتا (۴ تا ۷ هرتز): دامنه متوسط رو به بالا و فرکانس متوسط
+            val = Math.sin(t * 5.5 * Math.PI) * 12 + Math.cos(t * 7 * Math.PI + chanIdx) * 5;
+        } else if (eegState === 'alpha') {
+            // ریتم آلفا (۸ تا ۱۳ هرتز): پالس‌های متقارن و یکنواخت آرامش
+            val = Math.sin(t * 10 * Math.PI) * 10 + Math.sin(t * 12 * Math.PI + chanIdx) * 3;
+        } else if (eegState === 'beta') {
+            // ریتم بتا (۱۳ تا ۳۰ هرتز): فعالیت ذهنی، فرکانس تند با دامنه ضعیف
+            val = Math.sin(t * 18 * Math.PI) * 3.5 + Math.cos(t * 25 * Math.PI + chanIdx) * 2.5 + (Math.random() - 0.5) * 3;
+        }
+
+        return val;
+    }
+
+    // چرخه ترسیم و اسکن پیوسته
+    function tick(timestamp) {
+        sweepX += sweepSpeed;
+        if (sweepX >= canvas.width) {
+            sweepX = 0;
+            ctx.fillStyle = '#02060d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // پاک کردن فضای جلوتر از اسکن
+        ctx.fillStyle = '#02060d';
+        ctx.fillRect(sweepX + 2, 0, 15, canvas.height);
+
+        // خطوط کانال‌ها به صورت متمایز رسم می‌شوند
+        const baseHeights = [50, 140, 230];
+
+        ctx.strokeStyle = '#00d2d3';
+        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 2;
+        ctx.shadowColor = '#00d2d3';
+
+        for (let i = 0; i < 3; i++) {
+            let nextY = baseHeights[i] - generateEEGNoise(i, timestamp);
+
+            ctx.beginPath();
+            ctx.moveTo(lastPoints[i].x, lastPoints[i].y);
+            if (sweepX > lastPoints[i].x) {
+                ctx.lineTo(sweepX, nextY);
+            } else {
+                ctx.moveTo(sweepX, nextY);
+            }
+            ctx.stroke();
+
+            lastPoints[i] = { x: sweepX, y: nextY };
+        }
+        ctx.shadowBlur = 0;
+
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+
+    // بخش تعاملی لوب‌های مغزی (متن دقیقاً مطابق با اسلاید ۴۷ فارسی)
+    function selectLobe(lobe) {
+        document.querySelectorAll('.lobes-grid .lobe-btn').forEach(b => b.classList.remove('selected'));
+        const infoBox = document.getElementById('lobeInfoBox');
+
+        if (lobe === 'frontal') {
+            document.getElementById('lobeFrontal').classList.add('selected');
+            infoBox.innerHTML = `<strong>وظیفه پردازشی لوب پیشانی:</strong> در این لوب، عملیات آگاهانه شامل (تفکر، احساسات و ...) پردازش می‌شود.`;
+            infoBox.style.borderRightColor = '#00d2d3';
+        } else if (lobe === 'parietal') {
+            document.getElementById('lobeParietal').classList.add('selected');
+            infoBox.innerHTML = `<strong>وظیفه پردازشی لوب آهیانه‌ای:</strong> این لوب بخش بالایی نیمکره مغز است و نقش مهمی در یکپارچه‌سازی اطلاعات حسی از قسمت‌های مختلف بدن ایفا می‌کند. این لوب اطلاعات حسی از حواس مختلف را با اطلاعات ذخیره شده در حافظه ادغام کرده و اطلاعات مربوط به وضعیت درونی فرد را با اطلاعات حسی دنیای بیرون یکپارچه می‌سازد.`;
+            infoBox.style.borderRightColor = '#00d2d3';
+        } else if (lobe === 'temporal') {
+            document.getElementById('lobeTemporal').classList.add('selected');
+            infoBox.innerHTML = `<strong>وظیفه پردازشی لوب گیجگاهی:</strong> این لوب مرکز اصلی پردازش اطلاعات حس شنوایی در مغز است.`;
+            infoBox.style.borderRightColor = '#00d2d3';
+        } else if (lobe === 'occ') {
+            // برای هماهنگی با دکمه
+        } else if (lobe === 'occipital') {
+            document.getElementById('lobeOccipital').classList.add('selected');
+            infoBox.innerHTML = `<strong>وظیفه پردازشی لوب پس‌سری:</strong> این لوب مرکز اصلی پردازش اطلاعات بینایی ورودی به سیستم مغزی است.`;
+            infoBox.style.borderRightColor = '#00d2d3';
+        }
+    }
+
+
+    // محاسبات بخش ۱: حل مسئله سیستم ۲۰-۱۰ بر اساس شعاع جمجمه (اسلاید ۷۶)
+    function calculateEEGSpacings() {
+        const r = parseFloat(document.getElementById('skullRadius').value);
+        const resultDiv = document.getElementById('calcEegResult');
+
+        if (isNaN(r) || r <= 0) {
+            resultDiv.innerHTML = "<span style='color:#e74c3c;'>شعاع جمجمه نامعتبر است.</span>";
+            return;
+        }
+
+        // فرمول‌های فیزیکی مسئله اسلاید ۷۶:
+        // محیط نیم دایره (طول کل مسیر قوسی از نازیون تا اینیون) = pi * r
+        const totalArc = Math.round((Math.PI * r) * 100) / 100;
+
+        // طبق سیستم ۱۰-۲۰:
+        // s1 (فاصله اول از نازیون تا الکترود Fp) برابر با ۱۰٪ قوس کل است.
+        const s1 = Math.round((totalArc * 0.1) * 100) / 100;
+        // s2 (فاصله دوم از الکترود Fp تا الکترود F) برابر با ۲۰٪ قوس کل است.
+        const s2 = Math.round((totalArc * 0.2) * 100) / 100;
+        // s3 (فاصله سوم از الکترود F تا الکترود C) برابر با ۲۰٪ قوس کل است.
+        const s3 = Math.round((totalArc * 0.2) * 100) / 100;
+
+        resultDiv.innerHTML = `
+            طول قوس کل نازیون تا اینیون (π × r): <strong>${totalArc} سانتی‌متر</strong> <br>
+            • فاصله قوسی <strong>s1 (میزان ۱۰٪)</strong>: <strong>${s1} سانتی‌متر</strong> <br>
+            • فاصله قوسی <strong>s2 (میزان ۲۰٪)</strong>: <strong>${s2} سانتی‌متر</strong> <br>
+            • فاصله قوسی <strong>s3 (میزان ۲۰٪)</strong>: <strong>${s3} سانتی‌متر</strong> <br>
+            <span style='font-size:11px; color:#bdc3c7;'>پاسخ متناظر در سوال کنکور جزوه: گزینه ۱ (s1=3.14 , s2=6.28 , s3=6.28)</span>
+        `;
+    }
+
+
+    // خودآزمایی کنکوری
+    function checkAnswer() {
+        const ans = document.getElementById('examAnswer').value;
+        const resBox = document.getElementById('examResult');
+        resBox.style.display = "block";
+
+        if (ans === 'correct') {
+            resBox.innerHTML = "<span style='color:#2ecc71; font-weight:bold;'>پاسخ صحیح است!</span><br>طبق مشخصات اسلاید ۵۶ و ۷۰ جزوه، فرکانس این سیگنال در محدوده ۸ تا ۱۳ هرتز (ریتم آلفا) قرار دارد که بازگوکننده حالت آرامش، استراحت و بیداری آرام (Reflective, restful) است.";
+            resBox.style.borderRightColor = "#2ecc71";
+        } else if (ans === 'none') {
+            resBox.style.display = "none";
+        } else {
+            resBox.innerHTML = "<span style='color:#e74c3c; font-weight:bold;'>پاسخ نادرست است.</span><br>راهنمایی: فرکانس این موج با شمارش دوره‌ها در یک ثانیه، تقریباً ۱۰ هرتز به دست می‌آید که ویژگی شاخص امواج آلفا است.";
+            resBox.style.borderRightColor = "#e74c3c";
+        }
+    }
+
+    calculateEEGSpacings();
+</script>
+
+</body>
+</html>

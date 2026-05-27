@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENG</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap');
+
+        :root {
+            --bg-color: #0b0d12;
+            --card-bg: #151922;
+            --primary: #ff007f; 
+            --secondary: #ff9f43;
+            --accent: #00d2d3;
+            --text-color: #f1f2f6;
+            --border-color: #2c3542;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            direction: rti;
+            text-align: right;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+        }
+
+        p {
+            color: #a4b0be;
+            font-size: 13px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .monitor-container {
+            background-color: #020408;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            position: relative;
+            height: 240px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.1) inset;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .channel-label {
+            position: absolute;
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--primary);
+            z-index: 5;
+            top: 15px;
+            left: 15px;
+            text-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
+            font-weight: bold;
+        }
+
+        .controls-panel {
+            background-color: #0e111a;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(180deg, #1f2535 0%, #151924 100%);
+            color: #eceef2;
+            border: 1px solid var(--border-color);
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        button:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        .stim-btn {
+            border-color: var(--primary);
+            background: rgba(255, 0, 127, 0.05);
+            color: #ff3399;
+        }
+
+        .stim-btn:hover {
+            background: var(--primary);
+            color: #0b0d12;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+
+        .audio-btn.muted {
+            border-color: #747d8c;
+            color: #a4b0be;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+
+        .calculator-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #f1f2f6;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 9px;
+            box-sizing: border-box;
+            background-color: #222736;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .result-box {
+            background-color: #222736;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid var(--primary);
+            margin-top: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .theory-box {
+            background-color: #0e111a;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid var(--secondary);
+            margin-bottom: 12px;
+            font-size: 12.5px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ENG</h1>
+        <p>الکترونوروگرام</p>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--primary); font-size:15px; margin-bottom:12px;">مانیتور ثبت دوقطبی پتانسیل عصب (ENG Oscilloscope)</h3>
+            
+            <div class="monitor-container" onclick="unlockAudioContext()">
+                <canvas id="eegCanvas"></canvas>
+                <div class="channel-label" id="stimulusLabel">آماده برای شلیک پالس تحریک...</div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="flex-row">
+                    <button class="stim-btn" onclick="triggerStimulus('S2')">⚡ تحریک در نقطه نزدیک S2 (L2)</button>
+                    <button class="stim-btn" onclick="triggerStimulus('S1')">⚡ تحریک در نقطه دورتر S1 (L1)</button>
+                    <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()" style="margin-right:auto;">بوق صوتی 🔈</button>
+                </div>
+
+                <div class="slider-container" style="border-top: 1px solid var(--border-color); padding-top: 12px;">
+                    <label for="intensitySlider" style="font-size:12px; white-space:nowrap;">شدت پالس تحریک الکتریکی (موج H/M):</label>
+                    <input type="range" id="intensitySlider" min="1" max="3" value="1" oninput="updateIntensity()">
+                    <span id="intensityText" style="font-size:12px; color:var(--primary); font-weight:bold; min-width:80px;">کم (فقط موج H)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-section">
+            <h3 style="margin-top:0; color:var(--secondary); font-size:15px;">۱. محاسبه‌گر سرعت هدایت عصب (NCV)</h3>
+            <p style="font-size:12px; color:#a4b0be; margin-top:-5px;"> </p>
+            
+            <div class="form-group">
+                <label for="distanceD">فاصله بین دو نقطه تحریک (D به سانتی‌متر):</label>
+                <input type="number" id="distanceD" value="25" oninput="calculateNCV()">
+            </div>
+
+            <div class="form-group">
+                <label for="latency1">زمان تاخیر پاسخ از نقطه دورتر (L1 به ثانیه):</label>
+                <input type="number" id="latency1" value="3" step="0.1" oninput="calculateNCV()">
+            </div>
+
+            <div class="form-group">
+                <label for="latency2">زمان تاخیر پاسخ از نقطه نزدیک‌تر (L2 به ثانیه):</label>
+                <input type="number" id="latency2" value="2" step="0.1" oninput="calculateNCV()">
+            </div>
+
+            <div class="result-box" id="ncvResult">
+                سرعت هدایت عصب (u): <strong>۲۵ سانتی‌متر بر ثانیه</strong>
+            </div>
+
+            <hr style="border-color: var(--border-color); margin: 20px 0;">
+
+            <h3 style="color:var(--secondary); font-size:15px; margin-bottom:10px;">۲. تشریح پاسخ رفلکسی (اسلاید ۳۶)</h3>
+            
+            <div class="theory-box">
+                <strong>پاسخ دیررس (موج H):</strong><br>
+                در تحریکی با شدت کم، پیام عصبی از مسیر حسی به نخاع رفته و پس از سیناپس از طریق اعصاب حرکتی به عضله باز می‌گردد که زمان تاخیر طولانی‌تری دارد.
+            </div>
+
+            <div class="theory-box" style="border-right-color: var(--accent);">
+                <strong>پاسخ مستقیم (موج M):</strong><br>
+                با افزایش شدت تحریک به حد متوسط، اعصاب حرکتی نیز تحریک شده و پتانسیل مستقیماً به عضله رسیده و انقباض سریع‌تری تولید می‌کند.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('eegCanvas');
+    const ctx = canvas.getContext('2d');
+    const stimulusLabel = document.getElementById('stimulusLabel');
+    const intensitySlider = document.getElementById('intensitySlider');
+    const intensityText = document.getElementById('intensityText');
+
+    let currentX = 0;
+    let lastX = 0;
+    let lastY = 120;
+    const sweepSpeed = 3;
+
+    let isStimulating = false;
+    let stimPoint = 'S2'; 
+    let stimIntensity = 1; // ۱: ضعیف، ۲: متوسط، ۳: قوی
+    let stimProgress = 0;
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let audioUnlocked = false;
+
+    function initCanvasSize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        ctx.fillStyle = '#020408';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        lastY = canvas.height / 2;
+    }
+    window.addEventListener('resize', initCanvasSize);
+    initCanvasSize();
+
+    function unlockAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        audioUnlocked = true;
+    }
+
+    function toggleAudio() {
+        unlockAudioContext();
+        audioEnabled = !audioEnabled;
+        const btn = document.getElementById('btnAudio');
+        if (audioEnabled) {
+            btn.classList.remove('muted');
+            btn.innerText = 'قطع صدا 🔊';
+            playBeep(800, 0.05); // تست بوق سریع
+        } else {
+            btn.classList.add('muted');
+            btn.innerText = 'بوق صوتی 🔈';
+        }
+    }
+
+    function playBeep(freq, duration) {
+        if (!audioEnabled || !audioUnlocked || !audioCtx) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration - 0.01);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    function updateIntensity() {
+        stimIntensity = parseInt(intensitySlider.value);
+        if (stimIntensity === 1) {
+            intensityText.innerText = "کم (فقط موج H)";
+            intensityText.style.color = "var(--primary)";
+        } else if (stimIntensity === 2) {
+            intensityText.innerText = "متوسط (موج M و H)";
+            intensityText.style.color = "var(--secondary)";
+        } else if (stimIntensity === 3) {
+            intensityText.innerText = "قوی (فقط موج M)";
+            intensityText.style.color = "var(--accent)";
+        }
+    }
+
+    function triggerStimulus(point) {
+        unlockAudioContext();
+        stimPoint = point;
+        currentX = 0;
+        lastX = 0;
+        isStimulating = true;
+        stimProgress = 0;
+
+        stimulusLabel.innerText = `اعمال تحریک الکتریکی در ${point} ➔ پالس صادر شد.`;
+        
+        // پخش بوق لحظه تحریک الکتریکی اولیه (تیز و بسیار سریع)
+        playBeep(1200, 0.04);
+    }
+
+    // تولید ریاضی شکل موج رفلکسی تلفیقی M و H بر اساس شدت و زمان تاخیر (اسلاید ۳۳ و ۳۵)
+    function getENGWaveValue() {
+        if (!isStimulating) return 0;
+
+        let val = 0;
+        let t = stimProgress; // گام زمانی فریم‌ها (رنج ۰ تا ۸۰)
+
+        // رسم آرتیفکت تحریک (شوک سوزنی بسیار تیز دقیقا در زمان صفر تحریک)
+        if (t >= 0 && t < 3) {
+            val = (t === 1) ? -45 : (t === 2) ? 45 : 0;
+            stimProgress++;
+            return val;
+        }
+
+        // تاخیر پالس بر اساس نقطه تحریک انتخاب شده (S1 دورتر است پس تاخیر بیشتری دارد)
+        let delayOffset = (stimPoint === 'S1') ? 22 : 8;
+
+        // ۱. موج سریع M (پاسخ مستقیم عضلانی - بلافاصله پس از شوک ظاهر می‌شود)
+        if (stimIntensity >= 2) { 
+            let mStart = delayOffset;
+            if (t >= mStart && t < mStart + 12) {
+                let mt = (t - mStart) / 12;
+                val = Math.sin(mt * 2 * Math.PI) * 28; // دامنه موج M
+            }
+        }
+
+        // ۲. موج دیررس H (پاسخ انعکاسی نخاعی - با تاخیر زمان‌بر)
+        if (stimIntensity <= 2) { 
+            let hStart = delayOffset + 24; // تاخیر اضافه مسیر رفت و برگشت به نخاع
+            if (t >= hStart && t < hStart + 16) {
+                let ht = (t - hStart) / 16;
+                val = Math.sin(ht * 2 * Math.PI) * 20; // دامنه موج H
+                
+                // پخش بوق ثبت ماهیچه‌ای ثانویه هماهنگ با قله موج H
+                if (t === hStart + 4) {
+                    playBeep(600, 0.1);
+                }
+            }
+        }
+        
+        // بوق ثبت ماهیچه‌ای سریع در زمان رسیدن قله موج M
+        if (stimIntensity >= 2 && t === delayOffset + 3) {
+            playBeep(850, 0.08);
+        }
+
+        stimProgress++;
+        if (stimProgress >= 90) {
+            isStimulating = false;
+            stimulusLabel.innerText = "آماده برای ثبت بعدی...";
+        }
+
+        return val;
+    }
+
+    // پویانمایی اسیلوسکوپ
+    function tick() {
+        currentX += sweepSpeed;
+        if (currentX >= canvas.width) {
+            currentX = 0;
+            lastX = 0;
+        }
+
+        ctx.fillStyle = '#020408';
+        ctx.fillRect(currentX + 2, 0, 15, canvas.height);
+
+        ctx.fillStyle = 'rgba(2, 4, 8, 0.015)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const engVal = getENGWaveValue();
+        let targetY = (canvas.height / 2) - engVal;
+
+        // تنظیم رنگ صورتی نئونی بسیار درخشان برای وضوح فوق‌العاده
+        ctx.strokeStyle = '#ff007f';
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = '#ff007f';
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, targetY);
+        } else {
+            ctx.moveTo(currentX, targetY);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        lastX = currentX;
+        lastY = targetY;
+
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+
+    // محاسبات بخش ۱: حل مسئله سرعت هدایت عصب (اسلاید ۷۲)
+    function calculateNCV() {
+        const d = parseFloat(document.getElementById('distanceD').value);
+        const l1 = parseFloat(document.getElementById('latency1').value);
+        const l2 = parseFloat(document.getElementById('latency2').value);
+        const resultDiv = document.getElementById('ncvResult');
+
+        if (isNaN(d) || isNaN(l1) || isNaN(l2) || (l1 - l2) <= 0) {
+            resultDiv.innerHTML = "<span style='color:#e74c3c;'>مقادیر تاخیر نامعتبر است (تفاضل باید مثبت باشد).</span>";
+            return;
+        }
+
+        // فرمول سرعت هدایت عصب: u = D / (L1 - L2)
+        const u = Math.round((d / (l1 - l2)) * 100) / 100;
+
+        resultDiv.innerHTML = `
+            سرعت هدایت پتانسیل عمل (u): <strong>${u} سانتی‌متر بر ثانیه</strong> <br>
+            <span style='font-size:11px; color:#bdc3c7;'>راهنمای تشریحی مسئله ارشد جزوه: تفاضل زمان‌ها (۳ - ۲) برابر با ۱ ثانیه و صورت مسئله ۲۵ سانتی‌متر است؛ در نتیجه سرعت برابر ۲۵ سانتی‌متر بر ثانیه (گزینه ۱) می‌شود.</span>
+        `;
+    }
+
+    calculateNCV();
+</script>
+
+</body>
+</html>

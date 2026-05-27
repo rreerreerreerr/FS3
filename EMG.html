@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMG</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            margin: 0;
+            padding: 20px;
+            direction: rti;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #1f2833;
+            padding-bottom: 15px;
+        }
+        h1 {
+            color: #66fcf1;
+            margin: 0;
+            font-size: 22px;
+        }
+        p {
+            color: #a4b0be;
+            font-size: 13px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1.5fr 1fr;
+            }
+        }
+        .card {
+            background-color: #1f2833;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .monitor-container {
+            background-color: #0b0c10;
+            border: 2px solid #45f3ff;
+            border-radius: 6px;
+            position: relative;
+            height: 250px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .controls-panel {
+            background-color: #151b24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .flexion-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+        button {
+            background-color: #0b0c10;
+            color: #66fcf1;
+            border: 1px solid #66fcf1;
+            padding: 10px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #66fcf1;
+            color: #0b0c10;
+        }
+        button.active {
+            background-color: #66fcf1;
+            color: #0b0c10;
+            font-weight: bold;
+        }
+        .info-section {
+            background-color: #1f2833;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .definition-box {
+            background-color: #151b24;
+            padding: 12px;
+            border-radius: 4px;
+            border-right: 4px solid #66fcf1;
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .accordion-item {
+            background-color: #151b24;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .accordion-header {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #66fcf1;
+            border-bottom: 1px solid #1f2833;
+        }
+        .accordion-body {
+            padding: 12px;
+            font-size: 12.5px;
+            line-height: 1.6;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>EMG</h1>
+        <p>الکترومایوگرام </p>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h3 style="margin-top:0; color:#66fcf1; font-size:15px; margin-bottom:12px;">مانیتور سیگنال‌های انقباض فیبر عضلانی</h3>
+            
+            <div class="monitor-container" onclick="unlockAudioContext()">
+                <canvas id="emgCanvas"></canvas>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="flexion-slider-container">
+                    <label for="flexionSlider" style="white-space:nowrap; font-size:13px;">شدت انقباض عضله:</label>
+                    <input type="range" id="flexionSlider" min="0" max="100" value="10" oninput="updateFlexion()">
+                    <span id="flexionValue" style="min-width:40px; text-align:left; font-family:monospace; color:#66fcf1;">۱۰٪</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:11px; color:#a4b0be;">حالت سیگنال: <strong id="flexionStateText" style="color:#66fcf1;">انقباض ضعیف (Weak Flexion)</strong></span>
+                    <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()">پخش صدای بیوفیدبک عضلانی 🔈</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3 style="margin-top:0; color:#45f3ff; font-size:15px; margin-bottom:12px;">تعاریف و مبانی فیزیولوژیک </h3>
+            
+            <div class="definition-box">
+                <strong>فیبر عضلانی (Muscle Fiber):</strong><br>
+                به تارهای عضلانی که منقبض و منبسط می‌شوند، فیبر عضلانی می‌گویند .
+            </div>
+
+            <div class="definition-box" style="border-right-color: #ff4757;">
+                <strong>واحد حرکتی (Motor Unit):</strong><br>
+                کوچک‌ترین واحد عملکردی عصبی-عضلانی در فرآیند انقباض عضلات اسکلتی است و توسط عصب کنترل می‌شود.
+            </div>
+
+            <div class="definition-box" style="border-right-color: #ffd32a;">
+                <strong>سیگنال پلی‌فازیک (Polyphasic):</strong><br>
+                برآیند فعالیت همزمان تعداد زیادی موتور یونیت، سیگنال نهایی را تشکیل می‌دهد؛ از این رو سیگنال EMG حالتی پلی‌فازیک دارد.
+            </div>
+
+            <h3 style="color:#45f3ff; font-size:15px; margin-bottom:12px;">اهداف اصلی ثبت الکترومایوگرام</h3>
+            
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(0)">✓ تشخیص اختلالات عصبی-عضلانی</div>
+                <div class="accordion-body" id="acc0">
+                    با بررسی الگوهای الکتریکی عضلات، می‌توان نشانه‌های ناهنجاری مانند ضعف عضلات، اسپاسم و نوعی درد عضلانی را به درستی تشخیص داد.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(1)">✓ بهینه‌سازی و تنظیم کنترل پروتزها</div>
+                <div class="accordion-body" id="acc1">
+                    با تحلیل سیگنال EMG در محل استقرار پروتز، می‌توان تحرکات و عملکرد پروتز را بر اساس فعالیت عضلانی فرد مشخص کرد و تنظیمات آن را به وضعیت فعلی بیمار تطبیق داد.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(2)">✓ بهبود عملکرد ورزشی ورزشکاران</div>
+                <div class="accordion-body" id="acc2">
+                    با تحلیل سیگنال عضلانی در حین انجام ورزش، نقاط ضعف و قوت عضلات شناسایی شده و بر اساس این اطلاعات برنامه‌های تمرینی بهینه طراحی می‌شوند.
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(3)">✓ طراحی رابط کاربری فعال در بازی‌ها</div>
+                <div class="accordion-body" id="acc3">
+                    از حرکات عضلانی به عنوان ورودی برای کنترل مستقیم کاراکترها در بازی استفاده می‌شود که تجربه گیمینگ بسیار واقعی‌تر و تعاملی‌تری ایجاد می‌کند.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('emgCanvas');
+    const ctx = canvas.getContext('2d');
+    const flexionSlider = document.getElementById('flexionSlider');
+    const flexionValue = document.getElementById('flexionValue');
+    const flexionStateText = document.getElementById('flexionStateText');
+
+    let currentX = 0;
+    let lastX = 0;
+    let rawLastY = 125;
+    let envLastY = 125;
+    const sweepSpeed = 3;
+
+    let flexionLevel = 10; 
+
+    let audioEnabled = false;
+    let audioCtx = null;
+    let audioUnlocked = false;
+    let noiseNode = null;
+    let filterNode = null;
+    let gainNode = null;
+
+    function initCanvasSize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        ctx.fillStyle = '#0b0c10';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        rawLastY = canvas.height / 2;
+        envLastY = canvas.height / 2;
+    }
+    window.addEventListener('resize', initCanvasSize);
+    initCanvasSize();
+
+    function initEMGAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        if (!noiseNode) {
+            const bufferSize = audioCtx.sampleRate * 2; 
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+
+            noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = noiseBuffer;
+            noiseNode.loop = true;
+
+            filterNode = audioCtx.createBiquadFilter();
+            filterNode.type = 'bandpass';
+            filterNode.frequency.value = 220;
+            filterNode.Q.value = 1.2;
+
+            gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+
+            noiseNode.connect(filterNode);
+            filterNode.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            noiseNode.start(0);
+        }
+        audioUnlocked = true;
+    }
+
+    function unlockAudioContext() {
+        initEMGAudio();
+    }
+
+    function toggleAudio() {
+        initEMGAudio();
+        audioEnabled = !audioEnabled;
+        const btn = document.getElementById('btnAudio');
+        if (audioEnabled) {
+            btn.classList.remove('muted');
+            btn.innerText = 'قطع صدای بیوفیدبک 🔊';
+            updateAudioVolume();
+        } else {
+            btn.classList.add('muted');
+            btn.innerText = 'پخش صدای بیوفیدبک 🔈';
+            if (gainNode) gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        }
+    }
+
+    function updateAudioVolume() {
+        if (!audioEnabled || !gainNode || !audioCtx) return;
+        let vol = 0.002 + (flexionLevel / 100) * 0.12;
+        gainNode.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.05);
+        filterNode.frequency.linearRampToValueAtTime(150 + (flexionLevel / 100) * 200, audioCtx.currentTime + 0.05);
+    }
+
+    function updateFlexion() {
+        flexionLevel = parseInt(flexionSlider.value);
+        flexionValue.innerText = `${flexionLevel}٪`;
+
+        if (flexionLevel < 35) {
+            flexionStateText.innerText = "انقباض ضعیف (Weak Flexion)";
+            flexionStateText.style.color = '#66fcf1';
+        } else if (flexionLevel >= 35 && flexionLevel < 75) {
+            flexionStateText.innerText = "انقباض متوسط (Moderate Flexion)";
+            flexionStateText.style.color = '#ffd32a';
+        } else {
+            flexionStateText.innerText = "انقباض قوی (Strong Flexion)";
+            flexionStateText.style.color = '#ff4757';
+        }
+
+        updateAudioVolume();
+    }
+
+    function generateEMGNoise() {
+        const amplitude = (flexionLevel / 100) * (canvas.height * 0.42);
+        
+        let motorUnit1 = Math.sin(Date.now() * 0.12) * Math.cos(Date.now() * 0.04);
+        let motorUnit2 = Math.cos(Date.now() * 0.23) * Math.sin(Date.now() * 0.09);
+        let randomSpikes = (Math.random() - 0.5) * 2; 
+
+        let rawSignal = (motorUnit1 * 0.4 + motorUnit2 * 0.3 + randomSpikes * 0.3) * amplitude;
+        let envelope = (flexionLevel / 100) * (canvas.height * 0.35) * (0.7 + Math.sin(Date.now() * 0.005) * 0.15);
+
+        return { raw: rawSignal, env: envelope };
+    }
+
+    function tick() {
+        currentX += sweepSpeed;
+        if (currentX >= canvas.width) {
+            currentX = 0;
+            lastX = 0;
+        }
+
+        ctx.fillStyle = '#0b0c10';
+        ctx.fillRect(currentX + 2, 0, 15, canvas.height);
+
+        ctx.fillStyle = 'rgba(11, 12, 16, 0.015)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const sig = generateEMGNoise();
+        const centerY = canvas.height / 2;
+
+        let rawY = centerY - sig.raw;
+        let envY = centerY - sig.env; 
+
+        ctx.strokeStyle = 'rgba(155, 89, 182, 0.85)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(lastX, rawLastY);
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, rawY);
+        } else {
+            ctx.moveTo(currentX, rawY);
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffd32a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(lastX, envLastY);
+        if (currentX > lastX) {
+            ctx.lineTo(currentX, envY);
+        } else {
+            ctx.moveTo(currentX, envY);
+        }
+        ctx.stroke();
+
+        lastX = currentX;
+        rawLastY = rawY;
+        envLastY = envY;
+
+        requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+
+    function toggleAccordion(index) {
+        const body = document.getElementById(`acc${index}`);
+        const isVisible = body.style.display === "block";
+        
+        document.querySelectorAll('.accordion-body').forEach(b => b.style.display = "none");
+
+        if (!isVisible) {
+            body.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>
