@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>دستیار بتمنی</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap');
+
+        :root {
+            --bg-color: #080b11;
+            --card-bg: #121622;
+            --primary: #00d2d3;
+            --secondary: #ff9f43;
+            --accent: #3498db;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            direction: rtl;
+        }
+
+        header {
+            background-color: rgba(18, 22, 34, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--primary);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .back-btn {
+            background-color: rgba(255, 159, 67, 0.1);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            padding: 5px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary);
+            color: var(--bg-color);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 850px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: rgba(18, 22, 34, 0.2);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            overflow: hidden;
+            height: calc(100% - 60px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.user {
+            justify-content: flex-start;
+        }
+
+        .message-row.assistant {
+            justify-content: flex-end;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.7;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message-row.user .message {
+            background-color: rgba(0, 210, 211, 0.1);
+            border: 1px solid var(--primary);
+            border-top-right-radius: 2px;
+        }
+
+        .message-row.assistant .message {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top-left-radius: 2px;
+        }
+
+        .message-label {
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .message-row.user .message-label {
+            color: var(--primary);
+        }
+
+        .message-row.assistant .message-label {
+            color: var(--secondary);
+        }
+
+        .message.system-info {
+            align-self: center;
+            background-color: rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--text-color);
+            font-size: 11px;
+            text-align: center;
+            max-width: 95%;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .chat-input-area {
+            padding: 10px 15px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-shrink: 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        }
+
+        .chat-input {
+            flex: 1;
+            background-color: #171d2c;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 16px;
+            resize: none;
+            height: 40px;
+            max-height: 100px;
+            outline: none;
+            transition: all 0.25s ease;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 210, 211, 0.15);
+        }
+
+        .send-btn {
+            background-color: var(--primary);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0 15px;
+            height: 40px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .send-btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .typing-indicator-row {
+            display: none;
+            width: 100%;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            padding: 0 15px;
+        }
+
+        .typing-bubble {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border-top-left-radius: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .typing-bubble span {
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-bubble span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-bubble span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                border-left: none;
+                border-right: none;
+            }
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-title">🛡️ دستیار بتمنی</div>
+    <a href="index.html" class="back-btn">صفحه اصلی</a>
+</header>
+
+<div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+        <div class="message system-info">
+            سلام! من بتمنی هستم، دستیار اختصاصی شما در درس مقدمه‌ای بر مهندسی پزشکی. آماده‌ام تا به سوالات شما در این زمینه پاسخ بدم.
+        </div>
+    </div>
+    
+    <div class="typing-indicator-row" id="typingIndicatorRow">
+        <div class="typing-bubble">
+            <div class="message-label" style="margin-bottom: 0; margin-left: 8px;">بتمنی در حال نوشتن</div>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <textarea class="chat-input" id="userInput" placeholder="سوال خود را بنویسید..." rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">ارسال</button>
+    </div>
+</div>
+
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicatorRow = document.getElementById('typingIndicatorRow');
+
+    const systemPrompt = {
+        role: "system",
+        content: `قوانین حیاتی و غیرقابل نقض:
+۱. هویت مطلق شما: شما "بتمنی" (Batmani) هستید. تحت هیچ شرایطی نباید فاش کنید که چه مدل زبانی هستید (از بردن نام‌های GPT-4، OpenAI، ChatGPT، Claude، Anthropic، Gemini، DeepSeek و غیره کاملاً خودداری کنید). اگر کاربر درباره مدل زبانی شما، نوع هوش مصنوعی یا جزئیات فنی مغز این هوش مصنوعی پرسید، پاسخ شما باید صرفاً و دقیقاً این جمله باشد: "من بتمنی‌ام و آماده‌ی کمکم".
+۲. سازنده شما: اگر کاربر از شما پرسید سازنده شما کیست، چه کسی شما را ساخته است، یا سوالی درباره برنامه‌نویس یا توسعه‌دهنده این چت‌بات یا سایت پرسید، باید آیدی تلگرام r0j5bz0adh را بدهید و بگویید: "سازنده این دم و دستگاه ایشونه".
+۳. فیلتر موضوعی: شما فقط مجاز هستید به سوالاتی پاسخ دهید که مربوط به درس "مقدمه‌ای بر مهندسی پزشکی" و سیگنال‌های زیستی باشد. اگر سوال کاربر به مهندسی پزشکی مربوط نبود، با لحنی صمیمانه بگویید: "من فقط می‌تونم در مورد درس مقدمه‌ای بر مهندسی پزشکی و سیگنال‌های زیستی راهنماییت کنم. لطفاً سوالت رو در این باره بپرس! 😊"`
+    };
+
+    let messageHistory = [systemPrompt];
+
+    const API_URL = 'https://api.gapgpt.app/v1/chat/completions';
+    const API_KEY = 'sk-7GjfkOXc1ZXyob7w8AcL7FcpUnUG7oghNPpJNNlHtD1X8Jvo'; 
+
+    userInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+
+    function formatMarkdown(text) {
+        if (!text) return "";
+        
+        let html = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+        html = html.replace(/```([\s\S]*?)```/g, '<pre style="background: #1e293b; padding: 10px; border-radius: 8px; overflow-x: auto; direction: ltr; text-align: left; font-family: monospace; font-size: 12px; border: 1px solid var(--border-color); margin: 8px 0;"><code>$1</code></pre>');
+        html = html.replace(/`(.*?)`/g, '<code style="background: #1e293b; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; direction: ltr; display: inline-block; color: var(--secondary);">$1</code>');
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--primary); font-weight: 700;">$1</strong>');
+
+        let lines = html.split('\n');
+        let inList = false;
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (line.startsWith('- ') || line.startsWith('* ')) {
+                let content = line.substring(2);
+                if (!inList) {
+                    lines[i] = '<ul style="margin: 8px 0; padding-right: 20px; list-style-type: square;"><li>' + content + '</li>';
+                    inList = true;
+                } else {
+                    lines[i] = '<li>' + content + '</li>';
+                }
+            } else {
+                if (inList) {
+                    lines[i - 1] += '</ul>';
+                    inList = false;
+                }
+            }
+        }
+        if (inList) {
+            lines[lines.length - 1] += '</ul>';
+        }
+
+        return lines.join('<br>');
+    }
+
+    function appendMessage(sender, text) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('message-row', sender);
+
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+
+        const labelSpan = document.createElement('span');
+        labelSpan.classList.add('message-label');
+        labelSpan.innerText = sender === 'user' ? '👤 شما' : '🛡️ بتمنی';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = formatMarkdown(text);
+
+        messageDiv.appendChild(labelSpan);
+        messageDiv.appendChild(contentDiv);
+        rowDiv.appendChild(messageDiv);
+        chatMessages.appendChild(rowDiv);
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter' && !event.shiftKey && window.innerWidth > 600) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+
+    userInput.addEventListener('keydown', handleKeyPress);
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        userInput.value = '';
+        userInput.style.height = '40px';
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+
+        appendMessage('user', text);
+        messageHistory.push({ role: "user", content: text });
+
+        typingIndicatorRow.style.display = 'flex';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o-mini",
+                    messages: messageHistory,
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error();
+            }
+
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
+
+            typingIndicatorRow.style.display = 'none';
+            appendMessage('assistant', aiResponse);
+            messageHistory.push({ role: "assistant", content: aiResponse });
+
+        } catch (error) {
+            typingIndicatorRow.style.display = 'none';
+            appendMessage('assistant', 'متأسفانه خطایی رخ داد. لطفا دوباره تلاش کنید.');
+        } finally {
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+    }
+</script>
+
+</body>
+</html>
