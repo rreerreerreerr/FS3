@@ -11,7 +11,7 @@
             color: #d1d2d6;
             margin: 0;
             padding: 20px;
-            direction: rti;
+            direction: rtl;
         }
         .container {
             max-width: 1000px;
@@ -217,11 +217,13 @@
                 <div class="controls-grid">
                     <button id="btnUp" onclick="look('up')">نگاه به بالا (Up)</button>
                     <button id="btnCenter" class="active" onclick="look('center')">نگاه به جلو (Center)</button>
-                    <button id="btnBlink" onclick="look('blink')" style="background-color:#e74c3c; font-weight:bold;">پلک زدن (Blink)</button>
+                    <button id="btnDown" onclick="look('down')">نگاه به پایین (Down)</button>
                     
                     <button id="btnLeft" onclick="look('left')">نگاه به چپ (Left)</button>
+                    <button id="btnBlink" onclick="look('blink')" style="background-color:#e74c3c; font-weight:bold;">پلک زدن (Blink)</button>
                     <button id="btnRight" onclick="look('right')">نگاه به راست (Right)</button>
-                    <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()" style="grid-column: span 1;">صدا 🔈</button>
+                    
+                    <button id="btnAudio" class="audio-btn muted" onclick="toggleAudio()" style="grid-column: span 3;">صدا 🔈</button>
                 </div>
             </div>
         </div>
@@ -285,12 +287,12 @@
     const sweepSpeed = 3;
 
     let eyeAngle = 15; 
-    let eyeDirection = 'center'; // جهت جاری چشم
+    let eyeDirection = 'center'; 
     let blinkProgress = 0;
     let isBlinking = false;
 
-    let hVoltage = 0; // ولتاژ لید افقی
-    let vVoltage = 0; // ولتاژ لید عمودی
+    let hVoltage = 0; 
+    let vVoltage = 0; 
 
     let audioEnabled = false;
     let audioCtx = null;
@@ -381,17 +383,17 @@
             hVoltage = 0;
             vVoltage = 0;
         } else if (eyeDirection === 'left') {
-            hVoltage = scaleFactor; // مثبت در انحراف چپ
+            hVoltage = scaleFactor; 
             vVoltage = 0;
         } else if (eyeDirection === 'right') {
-            hVoltage = -scaleFactor; // منفی در انحراف راست
+            hVoltage = -scaleFactor; 
             vVoltage = 0;
         } else if (eyeDirection === 'up') {
             hVoltage = 0;
-            vVoltage = scaleFactor; // مثبت در انحراف بالا
+            vVoltage = scaleFactor; 
         } else if (eyeDirection === 'down') {
             hVoltage = 0;
-            vVoltage = -scaleFactor; // منفی در انحراف پایین
+            vVoltage = -scaleFactor; 
         }
 
         updateAudioFeedback();
@@ -445,10 +447,8 @@
         let hVal = hVoltage;
         let vVal = vVoltage;
 
-        // اگر پلک زدن فعال باشد، یک قله بزرگ نوک‌تیز (Transient Spike) روی کانال عمودی اعمال می‌شود (اسلاید ۲۵)
         if (isBlinking) {
-            let t = blinkProgress / 10; // طول ۱۰ فریم
-            // معادله ریاضی تولید اسپایک بسیار سریع
+            let t = blinkProgress / 10; 
             vVal = Math.sin(t * Math.PI) * 45; 
             blinkProgress++;
             if (blinkProgress >= 10) {
@@ -456,14 +456,12 @@
             }
         }
 
-        // افزودن نویز بسیار ریز طبیعی چشم (ترمور طبیعی عضلات چشم)
         let noiseH = (Math.random() - 0.5) * 1.5;
         let noiseV = (Math.random() - 0.5) * 1.5;
 
         return { h: hVal + noiseH, v: vVal + noiseV };
     }
 
-    // چرخه اسکن و رسم پایشگر EOG
     function tick() {
         currentX += sweepSpeed;
         if (currentX >= canvas.width) {
@@ -471,22 +469,19 @@
             lastX = 0;
         }
 
-        // پاک کننده اسکرین
         ctx.fillStyle = '#040711';
         ctx.fillRect(currentX + 2, 0, 15, canvas.height);
 
-        // خط تیره فسفری پاک‌کننده
         ctx.fillStyle = 'rgba(4, 7, 17, 0.015)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const sig = getEOGWaves();
-        const ch1Center = canvas.height * 0.25; // مرکز کانال افقی
-        const ch2Center = canvas.height * 0.75; // مرکز کانال عمودی
+        const ch1Center = canvas.height * 0.25; 
+        const ch2Center = canvas.height * 0.75; 
 
         let hY = ch1Center - sig.h;
         let vY = ch2Center - sig.v;
 
-        // ۱. رسم لید افقی چشم (آبی نئونی)
         ctx.strokeStyle = '#00a8ff';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -498,7 +493,6 @@
         }
         ctx.stroke();
 
-        // ۲. رسم لید عمودی چشم (زرد نئونی)
         ctx.strokeStyle = '#ffd32a';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -510,7 +504,6 @@
         }
         ctx.stroke();
 
-        // ثبت مکان‌ها برای فریم بعد
         lastX = currentX;
         hLastY = hY;
         vLastY = vY;
