@@ -291,31 +291,29 @@
     let currentY = 0;
     let lastX = 0;
     let lastY = 0;
-    const sweepSpeed = 2.5; // سرعت حرکت افقی موج
+    const sweepSpeed = 2.5; 
 
     let audioEnabled = false;
     let audioCtx = null;
     let audioUnlocked = false;
 
     let heartbeatMode = 'normal';
-    let beatInterval = 800; // بازه زمانی پیش‌فرض ریتم نرمال
+    let beatInterval = 800; 
     let lastBeatTime = 0;
 
     let waveProgress = 0;
     let isBeating = false;
-    const waveDuration = 60; // فریم‌های یک تپش کامل
+    const waveDuration = 60;
 
-    // دیتای باکیفیت و پیوسته شکل موج قلبی (طراحی آناتومیک منطبق بر اسلاید ۷)
-    // طول آرایه ۱۰۰ خانه است که تناسبات بخش‌های P-Q-R-S-T را به شکل واقعی شبیه‌سازی می‌کند
     const ecgTemplate = [
-        0, 0, 0, 0, 0, 0, 0, // خط صاف پایه (TP segment)
-        0.5, 1.2, 1.8, 2.0, 1.8, 1.2, 0.5, 0, // موج پی (P wave)
-        0, 0, 0, 0, 0, // خط بازگشتی PR segment
-        -1.5, -3.0, // افت Q
-        10, 25, 45, 60, 42, 15, -12, -22, -14, -5, // کمپلکس پرقدرت QRS
-        0, 0, 0, 0, 0, // خط صاف ST segment
-        0.8, 1.8, 2.8, 3.8, 4.2, 3.8, 2.8, 1.8, 0.8, // موج بلند و نرم T
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // امتداد خط صاف نهایی
+        0, 0, 0, 0, 0, 0, 0, 
+        0.5, 1.2, 1.8, 2.0, 1.8, 1.2, 0.5, 0, 
+        0, 0, 0, 0, 0, 
+        -1.5, -3.0, 
+        10, 25, 45, 60, 42, 15, -12, -22, -14, -5, 
+        0, 0, 0, 0, 0, 
+        0.8, 1.8, 2.8, 3.8, 4.2, 3.8, 2.8, 1.8, 0.8, 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
     ];
 
     function initCanvasSize() {
@@ -329,7 +327,6 @@
     window.addEventListener('resize', initCanvasSize);
     initCanvasSize();
 
-    // خنثی کردن قفل صوتی مرورگر با کلیک اول کاربر بر روی مانیتور یا هر دکمه
     function unlockAudioContext() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -347,14 +344,13 @@
         if (audioEnabled) {
             btn.classList.remove('muted');
             btn.innerText = 'قطع بوق صوتی 🔊';
-            playBeep(); // بوق تست فوری برای بازخورد صوتی سریع به کاربر
+            playBeep(); 
         } else {
             btn.classList.add('muted');
             btn.innerText = 'فعال‌سازی بوق صوتی 🔈';
         }
     }
 
-    // تولید صدای بوق دقیق و بدون ترق‌تروق (به کمک پوش فرکانس)
     function playBeep() {
         if (!audioEnabled || !audioUnlocked || !audioCtx) return;
         try {
@@ -365,12 +361,10 @@
             gainNode.connect(audioCtx.destination);
             
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(850, audioCtx.currentTime); // ۸۵۰ هرتز بوق مانیتورینگ بیمار
+            osc.frequency.setValueAtTime(850, audioCtx.currentTime); 
             
             gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
-            // شروع سریع بدون نویز پاپ
             gainNode.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.01);
-            // فرود نمایی و بی‌صدا شدن آرام صوتی
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
             
             osc.start(audioCtx.currentTime);
@@ -389,21 +383,21 @@
 
         if (mode === 'normal') {
             document.getElementById('btnNormal').classList.add('active');
-            beatInterval = 800; // بازه معادل ۷۵ ضربان
+            beatInterval = 800; 
             liveHrDisplay.style.color = '#2ecc71';
             statusText.style.color = '#2ecc71';
             statusText.innerText = "ریتم نرمال";
             liveHrDisplay.innerText = "75";
         } else if (mode === 'fast') {
             document.getElementById('btnFast').classList.add('active');
-            beatInterval = 460; // بازه معادل ۱۳۰ ضربان
+            beatInterval = 460; 
             liveHrDisplay.style.color = '#e74c3c';
             statusText.style.color = '#e74c3c';
             statusText.innerText = "تاکی‌کاردی (سریع)";
             liveHrDisplay.innerText = "130";
         } else if (mode === 'slow') {
             document.getElementById('btnSlow').classList.add('active');
-            beatInterval = 1350; // بازه معادل ۴۴ ضربان
+            beatInterval = 1350; 
             liveHrDisplay.style.color = '#3498db';
             statusText.style.color = '#3498db';
             statusText.innerText = "برادی‌کاردی (کند)";
@@ -417,17 +411,13 @@
         }
     }
 
-    // استخراج ارزش عددی پیوسته بر اساس دیتای آرایه ضربان
     function getECGValue() {
         if (!isBeating) return 0;
 
-        // نگاشت زمان گام جاری تپش به طول آرایه ۱۰۰ تایی داده الگو
         let index = Math.floor((waveProgress / waveDuration) * ecgTemplate.length);
         index = Math.max(0, Math.min(index, ecgTemplate.length - 1));
 
-        let val = ecgTemplate[index] * 2.2; // ضریب بزرگنمایی عمودی برای وضوح مانیتور
-
-        // شلیک بوق در قله تیز موج R (حول اندیس ۲۸ الگو)
+        let val = ecgTemplate[index] * 2.2; 
         if (index === 28 && !audioPlayedThisBeat) {
             playBeep();
             triggerVisualPulse();
@@ -451,11 +441,9 @@
         }, 85);
     }
 
-    // حلقه رندر اصلی با سیستم اسکن فسفری و پاک‌کننده بلادرنگ
     function tick(timestamp) {
         let interval = beatInterval;
         if (heartbeatMode === 'irregular') {
-            // شبیه‌سازی آریتمی قلبی (اسلاید ۸) به کمک توابع نوسانی تصادفی
             let shift = Math.sin(timestamp / 350) * 160 + Math.cos(timestamp / 130) * 60;
             interval = beatInterval + shift;
             
@@ -472,28 +460,22 @@
             audioPlayedThisBeat = false;
         }
 
-        // حرکت افقی مکان‌نما
         currentX += sweepSpeed;
 
-        // اگر خط به انتهای سمت راست مانیتور برسد، به ابتدا برمی‌گردد
         if (currentX >= canvas.width) {
             currentX = 0;
             lastX = 0;
         }
 
-        // محاسبه ارتفاع عمودی سیگنال در گام جاری
         const ecgValue = getECGValue();
         currentY = (canvas.height / 2) - ecgValue;
 
-        // ۱. نوسان‌نمای حرفه‌ای: کشیدن یک نوار مستطیل متحرک برای پاک‌کردن اطلاعات قدیمی جلوتر از خط اسکن جاری
         ctx.fillStyle = '#030805';
         ctx.fillRect(currentX + 2, 0, 15, canvas.height);
 
-        // ۲. افکت محوشدگی فسفر (هر فریم کل صفحه کمی تیره می‌شود تا دنباله رسم‌شده کم‌رنگ به نظر برسد)
-        ctx.fillStyle = 'rgba(3, 8, 5, 0.012)'; // ایجاد سایه تدریجی فسفر
+        ctx.fillStyle = 'rgba(3, 8, 5, 0.012)'; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // ۳. رسم خط اسکن جاری
         ctx.strokeStyle = '#2ecc71';
         ctx.lineWidth = 2.5;
         ctx.shadowBlur = 5;
@@ -501,7 +483,6 @@
 
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
-        // جلوگیری از ایجاد خط پیوندی بزرگ در زمان بازگشت اسکن از انتها به ابتدا
         if (currentX > lastX) {
             ctx.lineTo(currentX, currentY);
         } else {
@@ -510,18 +491,15 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // ثبت مکان فعلی برای گام بعدی
         lastX = currentX;
         lastY = currentY;
 
         requestAnimationFrame(tick);
     }
 
-    // آغاز انیمیشن
     requestAnimationFrame(tick);
 
 
-    // محاسبات بخش ۱: ضربان قلب (اسلاید ۶)
     function calculateBPM() {
         const type = document.getElementById('calcType').value;
         const count = parseFloat(document.getElementById('squareCount').value);
@@ -543,7 +521,6 @@
     }
 
 
-    // محاسبات بخش ۲: قانون اینتهوون و بردار قلبی (اسلایدهای ۱۱، ۱۲ و ۱۹)
     function calculateVector() {
         const leadI = parseFloat(document.getElementById('leadI').value);
         const leadIII = parseFloat(document.getElementById('leadIII').value);
@@ -554,13 +531,10 @@
             return;
         }
 
-        // قانون اینتهوون: II = I + III
         const leadII = leadI + leadIII;
 
-        // محاسبه هندسی زاویه بردار قلبی M
         let angle = Math.round(Math.atan2(leadIII - leadI/2, leadI * 0.866) * (180 / Math.PI));
 
-        // ارزیابی بر اساس محدوده زوایای اسلاید ۱۹
         let axisText = "";
         if (angle >= -30 && angle <= 90) {
             axisText = "<span style='color: #2ecc71; font-weight:bold;'>محور نرمال (Normal Axis)</span>";
@@ -579,7 +553,6 @@
         `;
     }
 
-    // راه‌اندازی اولین دور محاسبات
     calculateBPM();
     calculateVector();
 </script>
