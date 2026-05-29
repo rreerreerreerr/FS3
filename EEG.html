@@ -216,21 +216,7 @@
         </div>
 
         <div class="calculator-section">
-            <h3 style="margin-top:0; color:#e67e22; font-size:15px;">۱. محاسبه‌گر موقعیت الکترودها (سیستم ۲۰-۱۰)</h3>
-            <p style="font-size:12px; margin-top:-5px; color:#a4b0be;"></p>
-            
-            <div class="form-group">
-                <label for="skullRadius">شعاع جمجمه بیمار (r به سانتی‌متر):</label>
-                <input type="number" id="skullRadius" value="10" min="1" step="0.5" oninput="calculateEEGSpacings()">
-            </div>
-
-            <div class="result-box" id="calcEegResult">
-                محیط کل جمجمه: <strong>۶۲.۸ سانتی‌متر</strong>
-            </div>
-
-            <hr style="border-color: #1f2736; margin: 20px 0;">
-
-            <h3 style="color:#e67e22; font-size:15px;"> </h3>
+            <h3 style="margin-top:0; color:#e67e22; font-size:15px;">خودآزمایی ریتم‌های مغزی</h3>
             <div class="form-group" style="font-size:13px; line-height:1.6;">
                 <p><strong>سؤال:</strong> شکل موج زیر با بازه زمانی ۱ ثانیه مربوط به یک شخص سالم است. نام این موج و وضعیت شخص چیست؟</p>
                 <div style="background-color:#02060d; height:50px; border:1px solid #1f2736; margin-bottom:10px; position:relative;">
@@ -282,7 +268,6 @@
         }
     }
 
-    // پخش یک صدای فرکانسی مستمر و شبیه‌ساز امواج دوگوشی (باقابلیت کنترل پویا فرکانس)
     function playEEGHum(freq) {
         if (!audioEnabled || !audioCtx) return;
         try {
@@ -299,13 +284,12 @@
             busterOsc.type = 'sine';
             busterOsc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             
-            // پخش ملایم صدا بدون نویز ناگهانی
             busterGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
             busterGain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.5);
 
             busterOsc.start();
         } catch(e) {
-            console.log("صوت ریتم اجرا نشد: ", e);
+            console.log("Audio failed to play: ", e);
         }
     }
 
@@ -335,10 +319,10 @@
 
     function updateAudioTone() {
         if (!audioEnabled) return;
-        if (eegState === 'delta') playEEGHum(80);      // صدای بم عمیق ریتم دلتا (خواب عمیق)
-        else if (eegState === 'theta') playEEGHum(140); // صدای میانی ریتم تتا (نیمه خواب)
-        else if (eegState === 'alpha') playEEGHum(220); // صدای ملایم ریتم آلفا (آرامش)
-        else if (eegState === 'beta') playEEGHum(380);  // صدای تیز ریتم بتا (فعالیت شدید)
+        if (eegState === 'delta') playEEGHum(80);
+        else if (eegState === 'theta') playEEGHum(140);
+        else if (eegState === 'alpha') playEEGHum(220);
+        else if (eegState === 'beta') playEEGHum(380);
     }
 
     function setEEGState(state) {
@@ -356,29 +340,23 @@
         updateAudioTone();
     }
 
-    // تولید ریاضی سیگنال‌های مغزی بر اساس فرکانس و فازهای نوسانی اسلاید ۴۹ و ۵۶
     function generateEEGNoise(chanIdx, timestamp) {
         let val = 0;
         let t = timestamp / 1000;
 
         if (eegState === 'delta') {
-            // ریتم دلتا (۱ تا ۴ هرتز): دامنه بسیار بزرگ و فرکانس کند
             val = Math.sin(t * 2 * Math.PI) * 22 + Math.sin(t * 3.5 * Math.PI + chanIdx) * 8;
         } else if (eegState === 'theta') {
-            // ریتم تتا (۴ تا ۷ هرتز): دامنه متوسط رو به بالا و فرکانس متوسط
             val = Math.sin(t * 5.5 * Math.PI) * 12 + Math.cos(t * 7 * Math.PI + chanIdx) * 5;
         } else if (eegState === 'alpha') {
-            // ریتم آلفا (۸ تا ۱۳ هرتز): پالس‌های متقارن و یکنواخت آرامش
             val = Math.sin(t * 10 * Math.PI) * 10 + Math.sin(t * 12 * Math.PI + chanIdx) * 3;
         } else if (eegState === 'beta') {
-            // ریتم بتا (۱۳ تا ۳۰ هرتز): فعالیت ذهنی، فرکانس تند با دامنه ضعیف
             val = Math.sin(t * 18 * Math.PI) * 3.5 + Math.cos(t * 25 * Math.PI + chanIdx) * 2.5 + (Math.random() - 0.5) * 3;
         }
 
         return val;
     }
 
-    // چرخه ترسیم و اسکن پیوسته
     function tick(timestamp) {
         sweepX += sweepSpeed;
         if (sweepX >= canvas.width) {
@@ -387,11 +365,9 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        // پاک کردن فضای جلوتر از اسکن
         ctx.fillStyle = '#02060d';
         ctx.fillRect(sweepX + 2, 0, 15, canvas.height);
 
-        // خطوط کانال‌ها به صورت متمایز رسم می‌شوند
         const baseHeights = [50, 140, 230];
 
         ctx.strokeStyle = '#00d2d3';
@@ -419,8 +395,6 @@
     }
     requestAnimationFrame(tick);
 
-
-    // بخش تعاملی لوب‌های مغزی (متن دقیقاً مطابق با اسلاید ۴۷ فارسی)
     function selectLobe(lobe) {
         document.querySelectorAll('.lobes-grid .lobe-btn').forEach(b => b.classList.remove('selected'));
         const infoBox = document.getElementById('lobeInfoBox');
@@ -437,8 +411,6 @@
             document.getElementById('lobeTemporal').classList.add('selected');
             infoBox.innerHTML = `<strong>وظیفه پردازشی لوب گیجگاهی:</strong> این لوب مرکز اصلی پردازش اطلاعات حس شنوایی در مغز است.`;
             infoBox.style.borderRightColor = '#00d2d3';
-        } else if (lobe === 'occ') {
-            // برای هماهنگی با دکمه
         } else if (lobe === 'occipital') {
             document.getElementById('lobeOccipital').classList.add('selected');
             infoBox.innerHTML = `<strong>وظیفه پردازشی لوب پس‌سری:</strong> این لوب مرکز اصلی پردازش اطلاعات بینایی ورودی به سیستم مغزی است.`;
@@ -446,40 +418,6 @@
         }
     }
 
-
-    // محاسبات بخش ۱: حل مسئله سیستم ۲۰-۱۰ بر اساس شعاع جمجمه (اسلاید ۷۶)
-    function calculateEEGSpacings() {
-        const r = parseFloat(document.getElementById('skullRadius').value);
-        const resultDiv = document.getElementById('calcEegResult');
-
-        if (isNaN(r) || r <= 0) {
-            resultDiv.innerHTML = "<span style='color:#e74c3c;'>شعاع جمجمه نامعتبر است.</span>";
-            return;
-        }
-
-        // فرمول‌های فیزیکی مسئله اسلاید ۷۶:
-        // محیط نیم دایره (طول کل مسیر قوسی از نازیون تا اینیون) = pi * r
-        const totalArc = Math.round((Math.PI * r) * 100) / 100;
-
-        // طبق سیستم ۱۰-۲۰:
-        // s1 (فاصله اول از نازیون تا الکترود Fp) برابر با ۱۰٪ قوس کل است.
-        const s1 = Math.round((totalArc * 0.1) * 100) / 100;
-        // s2 (فاصله دوم از الکترود Fp تا الکترود F) برابر با ۲۰٪ قوس کل است.
-        const s2 = Math.round((totalArc * 0.2) * 100) / 100;
-        // s3 (فاصله سوم از الکترود F تا الکترود C) برابر با ۲۰٪ قوس کل است.
-        const s3 = Math.round((totalArc * 0.2) * 100) / 100;
-
-        resultDiv.innerHTML = `
-            طول قوس کل نازیون تا اینیون (π × r): <strong>${totalArc} سانتی‌متر</strong> <br>
-            • فاصله قوسی <strong>s1 (میزان ۱۰٪)</strong>: <strong>${s1} سانتی‌متر</strong> <br>
-            • فاصله قوسی <strong>s2 (میزان ۲۰٪)</strong>: <strong>${s2} سانتی‌متر</strong> <br>
-            • فاصله قوسی <strong>s3 (میزان ۲۰٪)</strong>: <strong>${s3} سانتی‌متر</strong> <br>
-            <span style='font-size:11px; color:#bdc3c7;'></span>
-        `;
-    }
-
-
-    // خودآزمایی کنکوری
     function checkAnswer() {
         const ans = document.getElementById('examAnswer').value;
         const resBox = document.getElementById('examResult');
@@ -495,8 +433,6 @@
             resBox.style.borderRightColor = "#e74c3c";
         }
     }
-
-    calculateEEGSpacings();
 </script>
 
 </body>
