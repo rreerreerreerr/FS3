@@ -338,7 +338,7 @@
         if (audioEnabled) {
             btn.classList.remove('muted');
             btn.innerText = 'قطع صدا 🔊';
-            playBeep(800, 0.05); // تست بوق سریع
+            playBeep(800, 0.05); 
         } else {
             btn.classList.add('muted');
             btn.innerText = 'بوق صوتی 🔈';
@@ -391,51 +391,43 @@
 
         stimulusLabel.innerText = `اعمال تحریک الکتریکی در ${point} ➔ پالس صادر شد.`;
         
-        // پخش بوق لحظه تحریک الکتریکی اولیه (تیز و بسیار سریع)
         playBeep(1200, 0.04);
     }
 
-    // تولید ریاضی شکل موج رفلکسی تلفیقی M و H بر اساس شدت و زمان تاخیر (اسلاید ۳۳ و ۳۵)
     function getENGWaveValue() {
         if (!isStimulating) return 0;
 
         let val = 0;
-        let t = stimProgress; // گام زمانی فریم‌ها (رنج ۰ تا ۸۰)
+        let t = stimProgress; 
 
-        // رسم آرتیفکت تحریک (شوک سوزنی بسیار تیز دقیقا در زمان صفر تحریک)
         if (t >= 0 && t < 3) {
             val = (t === 1) ? -45 : (t === 2) ? 45 : 0;
             stimProgress++;
             return val;
         }
 
-        // تاخیر پالس بر اساس نقطه تحریک انتخاب شده (S1 دورتر است پس تاخیر بیشتری دارد)
         let delayOffset = (stimPoint === 'S1') ? 22 : 8;
 
-        // ۱. موج سریع M (پاسخ مستقیم عضلانی - بلافاصله پس از شوک ظاهر می‌شود)
         if (stimIntensity >= 2) { 
             let mStart = delayOffset;
             if (t >= mStart && t < mStart + 12) {
                 let mt = (t - mStart) / 12;
-                val = Math.sin(mt * 2 * Math.PI) * 28; // دامنه موج M
+                val = Math.sin(mt * 2 * Math.PI) * 28; 
             }
         }
 
-        // ۲. موج دیررس H (پاسخ انعکاسی نخاعی - با تاخیر زمان‌بر)
         if (stimIntensity <= 2) { 
-            let hStart = delayOffset + 24; // تاخیر اضافه مسیر رفت و برگشت به نخاع
+            let hStart = delayOffset + 24; 
             if (t >= hStart && t < hStart + 16) {
                 let ht = (t - hStart) / 16;
-                val = Math.sin(ht * 2 * Math.PI) * 20; // دامنه موج H
+                val = Math.sin(ht * 2 * Math.PI) * 20; 
                 
-                // پخش بوق ثبت ماهیچه‌ای ثانویه هماهنگ با قله موج H
                 if (t === hStart + 4) {
                     playBeep(600, 0.1);
                 }
             }
         }
         
-        // بوق ثبت ماهیچه‌ای سریع در زمان رسیدن قله موج M
         if (stimIntensity >= 2 && t === delayOffset + 3) {
             playBeep(850, 0.08);
         }
@@ -449,7 +441,6 @@
         return val;
     }
 
-    // پویانمایی اسیلوسکوپ
     function tick() {
         currentX += sweepSpeed;
         if (currentX >= canvas.width) {
@@ -466,7 +457,6 @@
         const engVal = getENGWaveValue();
         let targetY = (canvas.height / 2) - engVal;
 
-        // تنظیم رنگ صورتی نئونی بسیار درخشان برای وضوح فوق‌العاده
         ctx.strokeStyle = '#ff007f';
         ctx.lineWidth = 2.5;
         ctx.shadowBlur = 5;
@@ -490,7 +480,6 @@
     requestAnimationFrame(tick);
 
 
-    // محاسبات بخش ۱: حل مسئله سرعت هدایت عصب (اسلاید ۷۲)
     function calculateNCV() {
         const d = parseFloat(document.getElementById('distanceD').value);
         const l1 = parseFloat(document.getElementById('latency1').value);
@@ -502,7 +491,6 @@
             return;
         }
 
-        // فرمول سرعت هدایت عصب: u = D / (L1 - L2)
         const u = Math.round((d / (l1 - l2)) * 100) / 100;
 
         resultDiv.innerHTML = `
