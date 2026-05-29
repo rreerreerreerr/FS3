@@ -59,7 +59,7 @@
             transition: background-color 0.1s ease-out;
         }
         .monitor-container.flash-active {
-            background-color: #ffffff; /* افکت فلاش تحریک نوری */
+            background-color: #ffffff;
         }
         canvas {
             display: block;
@@ -144,18 +144,15 @@
     </header>
 
     <div class="grid">
-        <!-- ستون مانیتور پایشگر زنده -->
         <div class="card">
             <h3 style="margin-top:0; color:#00ecff; font-size:15px; margin-bottom:12px;">پایشگر پاسخ الکتریکی شبکیه (Retinal Electroretinogram)</h3>
             
             <div class="monitor-container" id="monitorBox" onclick="unlockAudioContext()">
                 <canvas id="eegCanvas"></canvas>
-                <!-- برچسب‌ها بر اساس فرآیند زمانی اسلاید ۳۱ -->
                 <div class="label-overlay" style="top: 15px; left: 15px;">زمان تحریک نوری (Light ON) ➔ t=0</div>
                 <div class="label-overlay" style="bottom: 15px; right: 15px; color:#a4b0be; font-size:10px;">بازه زمانی ثبت: ۲ ثانیه (0.0s to 2.0s)</div>
             </div>
 
-            <!-- بخش کنترل پویای فلاش تحریک نوری -->
             <div class="stimulus-panel">
                 <button id="btnStimulate" onclick="triggerLightFlash()">تحریک نوری شبکیه 💡 (Flash Stimulus)</button>
                 
@@ -171,7 +168,6 @@
             </div>
         </div>
 
-        <!-- ستون تعاریف و اطلاعات کاربردی منطبق بر جزوه -->
         <div class="info-section">
             <h3 style="margin-top:0; color:#00ecff; font-size:15px; margin-bottom:12px;">مبانی ثبت و فیزیولوژی شبکیه </h3>
             
@@ -213,20 +209,19 @@
 
     let isStimulated = false;
     let stimulusProgress = 0;
-    let isDamaged = false; // وضعیت سلامت گیرنده‌ها
-
+    let isDamaged = false;
+    
     let audioEnabled = false;
     let audioCtx = null;
     let audioUnlocked = false;
 
-    // ۱۰۰ نقطه پیوسته برای مدلسازی کاملا طبیعی موج ERG بر اساس نمودار اسلاید ۳۱
     const ergTemplate = [
-        0, 0, 0, 0, 0, // خط صاف اولیه پیش از فلاش
-        -2, -5, -9, -12, -15, -12, -8, // موج a (افت عمیق منفی گیرنده‌های نوری)
-        2, 18, 38, 55, 65, 68, 65, 55, 42, 28, 18, 10, 5, 2, // موج فوق‌العاده تیز b مثبت (سلول‌های دو قطبی)
-        1, 1, 2, 3, 5, 8, 11, 13, 15, 16, 17, 18, 17, 15, 13, 10, 8, 6, 4, 2, 1, 0, // موج بسیار ملایم و طولانی c (سلول‌های RPE)
-        0, 0, 0, 0, 1, 3, 5, 6, 5, 3, 1, 0, // موج ثانویه d (پاسخ خاموشی زمان قطع فلاش)
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // بازگشت پایدار به خط مبدا
+        0, 0, 0, 0, 0, 
+        -2, -5, -9, -12, -15, -12, -8,
+        2, 18, 38, 55, 65, 68, 65, 55, 42, 28, 18, 10, 5, 2, 
+        1, 1, 2, 3, 5, 8, 11, 13, 15, 16, 17, 18, 17, 15, 13, 10, 8, 6, 4, 2, 1, 0, 
+        0, 0, 0, 0, 1, 3, 5, 6, 5, 3, 1, 0, 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
     ];
 
     function initCanvasSize() {
@@ -262,7 +257,6 @@
         }
     }
 
-    // پخش صدای پیزو-الکتریک شبیه‌ساز شارژ فلاش نوری و تخلیه ناگهانی صوتی در ثبت
     function playFlashSound() {
         if (!audioEnabled || !audioUnlocked || !audioCtx) return;
         try {
@@ -273,7 +267,6 @@
 
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-            // افکت شارژ خازنی فلاش نوری (فرکانس صعودی بسیار سریع)
             osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.12);
 
             gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
@@ -291,18 +284,15 @@
         isDamaged = retinaState.value === 'damaged';
     }
 
-    // شبیه‌سازی زدن فلاش نوری کوتاه مدت (Light ON - اسلاید ۳۲)
     function triggerLightFlash() {
         unlockAudioContext();
         
-        // ۱. فعال کردن افکت فیزیکی فلاش (سفید شدن مانیتور برای چند میلی ثانیه)
         monitorBox.classList.add('flash-active');
         playFlashSound();
 
         setTimeout(() => {
             monitorBox.classList.remove('flash-active');
             
-            // ۲. راه‌اندازی فرآیند ثبت و ترسیم پالس بیوالکتریک ERG
             currentX = 0;
             lastX = 0;
             isStimulated = true;
@@ -310,18 +300,16 @@
         }, 120);
     }
 
-    // شبیه‌سازی دقیق و پویا ریاضی امواج ERG
     function getERGValue() {
         if (!isStimulated) return 0;
 
         let index = Math.floor((stimulusProgress / 80) * ergTemplate.length);
         index = Math.max(0, Math.min(index, ergTemplate.length - 1));
 
-        let val = ergTemplate[index] * 2.2; // بزرگنمایی مقیاسی موج
+        let val = ergTemplate[index] * 2.2;
 
-        // اعمال تضعیف پتانسیل در صورت خرابی گیرنده‌های نوری (اسلاید ۳۲)
         if (isDamaged) {
-            val = val * 0.12; // ۸۸٪ افت پتانسیل در تخریب شبکیه
+            val = val * 0.12;
         }
 
         stimulusProgress++;
@@ -332,7 +320,6 @@
         return val;
     }
 
-    // چرخه انیمیشن اسکن مانیتور
     function tick() {
         currentX += sweepSpeed;
         if (currentX >= canvas.width) {
@@ -340,18 +327,15 @@
             lastX = 0;
         }
 
-        // رسم پاک کننده
         ctx.fillStyle = '#03060c';
         ctx.fillRect(currentX + 2, 0, 15, canvas.height);
 
-        // دنباله تدریجی تیره فسفری موج
         ctx.fillStyle = 'rgba(3, 6, 12, 0.012)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         const ergVal = getERGValue();
         let targetY = (canvas.height / 2) - ergVal;
 
-        // رسم پالس شبکیه با تم فیروزه‌ای نئونی چشم
         ctx.strokeStyle = '#00ecff';
         ctx.lineWidth = 2.5;
         ctx.shadowBlur = 4;
