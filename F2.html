@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شبیه‌ساز پتانسیل‌های غشایی و نورون - plexus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap');
+
+        :root {
+            --bg-color: #080b11;
+            --card-bg: #121622;
+            --primary: #00d2d3;
+            --secondary: #ff9f43;
+            --accent: #3498db;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --success: #2ecc71;
+            --error: #e74c3c;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            direction: rtl;
+            text-align: right;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            background-color: rgba(18, 22, 34, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(0, 210, 211, 0.3);
+            line-height: 1.2;
+            text-decoration: none;
+        }
+
+        .back-btn {
+            background-color: rgba(0, 210, 211, 0.1);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #121622 0%, #171d2c 100%);
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hero h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .hero-meta {
+            display: inline-block;
+            background-color: rgba(255, 159, 67, 0.1);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 900;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--primary);
+            padding-right: 12px;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 900px) {
+            .grid-2col {
+                grid-template-columns: 1.2fr 1fr;
+            }
+            .grid-equal {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+
+        .card h3 {
+            color: var(--primary);
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            outline: none;
+            accent-color: var(--primary);
+        }
+
+        .output-box {
+            background-color: rgba(0, 210, 211, 0.05);
+            border: 1px dashed var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .output-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .output-value {
+            font-weight: bold;
+            color: var(--secondary);
+            font-family: monospace;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: #1e293b;
+            color: #fff;
+            border: 1px solid #334155;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            border-color: var(--primary);
+            background-color: rgba(0, 210, 211, 0.1);
+        }
+
+        button.active {
+            background-color: var(--primary);
+            color: var(--bg-color);
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+
+        button.action-btn {
+            background-color: var(--secondary);
+            color: var(--bg-color);
+            border-color: var(--secondary);
+            font-weight: bold;
+            width: 100%;
+        }
+
+        button.action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .plot-container {
+            background-color: #02060d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background-color: #02060d;
+        }
+
+        .list-item {
+            background-color: #171d2c;
+            padding: 12px;
+            border-radius: 8px;
+            border-right: 4px solid var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .list-item strong {
+            display: block;
+            color: var(--secondary);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .list-item p {
+            font-size: 11.5px;
+            margin: 0;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .hh-circuit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hh-svg {
+            width: 100%;
+            max-width: 420px;
+            background-color: #02060d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .interactive-branch {
+            cursor: pointer;
+            transition: stroke 0.2s, opacity 0.2s;
+        }
+
+        .interactive-branch:hover {
+            opacity: 0.8;
+            stroke-width: 2.5px !important;
+        }
+
+        .interactive-branch.active {
+            stroke: var(--secondary) !important;
+            filter: drop-shadow(0px 0px 4px var(--secondary));
+        }
+
+        .diffusion-laws-box {
+            font-family: monospace;
+            background-color: #080b11;
+            padding: 12px;
+            border-radius: 6px;
+            border-right: 4px solid var(--accent);
+            font-size: 13px;
+            direction: ltr;
+            text-align: left;
+            margin-bottom: 12px;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <a href="index.html" class="logo">plexus</a>
+        <a href="index.html" class="back-btn">← بازگشت به پورتال</a>
+    </div>
+</header>
+
+<div class="container">
+    
+    <section class="hero">
+        <div class="hero-meta">فصل دوم: منابع پتانسیل‌های حیاتی</div>
+        <h2>شبیه‌ساز بیوالکتریکی غشای سلول و پتانسیل‌های عصبی</h2>
+        <p style="margin: 15px auto 0 auto; color: var(--text-muted); font-size: 13px; line-height: 1.8;">
+            این پایگاه شبیه‌سازی و محاسباتی بر اساس مفاهیم پایه سلولی، پتانسیل عمل و مدل مداری <strong>هاجکین-هاکسلی</strong> تدریس شده توسط <strong>استاد عابدزاده</strong> طراحی شده است.
+        </p>
+    </section>
+
+    <div class="section-title">۱. شبیه‌ساز پتانسیل استراحت غشا (معادله گُلدمن و پتانسیل نرنست)</div>
+    <div class="grid grid-2col">
+        
+        <div class="card">
+            <h3>تنظیمات غلظت یونی و نفوذپذیری (GHK Equation)</h3>
+            <div class="btn-group">
+                <button id="presetSquidRest" class="active" onclick="setGhkPreset('squid-rest')">حالت استراحت (Squid Axon)</button>
+                <button id="presetSquidPeak" onclick="setGhkPreset('squid-peak')">اوج پتانسیل عمل (Na Active)</button>
+            </div>
+
+            <!-- Potassium sliders -->
+            <div class="form-group">
+                <label>غلظت پتاسیم داخل [K⁺]i : <span id="kiVal" class="output-value">400</span> mM | خارج [K⁺]o : <span id="koVal" class="output-value">20</span> mM</label>
+                <input type="range" id="koInput" min="2" max="50" value="20" oninput="calculateGhk()">
+            </div>
+            <div class="form-group">
+                <label>نفوذپذیری نسبی پتاسیم (Pk): <span id="pkVal" class="output-value">1.00</span></label>
+                <input type="range" id="pkInput" min="0" max="1" value="1" step="0.05" oninput="calculateGhk()">
+            </div>
+
+            <!-- Sodium sliders -->
+            <div class="form-group">
+                <label>غلظت سدیم داخل [Na⁺]i : <span id="naiVal" class="output-value">50</span> mM | خارج [Na⁺]o : <span id="naoVal" class="output-value">440</span> mM</label>
+                <input type="range" id="naoInput" min="50" max="500" value="440" oninput="calculateGhk()">
+            </div>
+            <div class="form-group">
+                <label>نفوذپذیری نسبی سدیم (Pna): <span id="pnaVal" class="output-value">0.04</span></label>
+                <input type="range" id="pnaInput" min="0" max="20" value="0.04" step="0.01" oninput="calculateGhk()">
+            </div>
+
+            <!-- Chloride sliders -->
+            <div class="form-group">
+                <label>غلظت کلر داخل [Cl⁻]i : <span id="cliVal" class="output-value">52</span> mM | خارج [Cl⁻]o : <span id="cloVal" class="output-value">560</span> mM</label>
+                <input type="range" id="cloInput" min="50" max="600" value="560" oninput="calculateGhk()">
+            </div>
+            <div class="form-group">
+                <label>نفوذپذیری نسبی کلر (Pcl): <span id="pclVal" class="output-value">0.45</span></label>
+                <input type="range" id="pclInput" min="0" max="2" value="0.45" step="0.05" oninput="calculateGhk()">
+            </div>
+
+            <div class="output-box">
+                <div class="output-row">
+                    <span>پتانسیل تعادلی پتاسیم (E_K):</span>
+                    <span id="outEK" class="output-value">-75.8 mV</span>
+                </div>
+                <div class="output-row">
+                    <span>پتانسیل تعادلی سدیم (E_Na):</span>
+                    <span id="outENa" class="output-value">+55.0 mV</span>
+                </div>
+                <div class="output-row">
+                    <span>پتانسیل تعادلی کلر (E_Cl):</span>
+                    <span id="outECl" class="output-value">-60.1 mV</span>
+                </div>
+                <div class="output-row" style="border-top:1px solid var(--border-color); padding-top:8px; margin-top:8px;">
+                    <strong>پتانسیل نهایی غشای سلول (Vm):</strong>
+                    <span id="outVm" class="output-value" style="color:var(--primary); font-size:16px;">-60.0 mV</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3>تحلیل الکتروشیمیایی غشا (اسلایدهای ۲۵ تا ۲۷)</h3>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:0;">
+                    اختلاف غلظت یون‌های دو طرف غشا گرادیان غلظتی ایجاد کرده و تمایل به رانش یون‌ها دارد. پتانسیل تعادلی هر یون مستقل از یون‌های دیگر توسط <strong>معادله نرنست</strong> به دست می‌آید. زمانی که غشا تحت تاثیر چندین یون باشد، پتانسیل نهایی (Vm) بر اساس نفوذپذیری نسبی یون‌ها توسط <strong>معادله گُلدمن</strong> توصیف می‌گردد:
+                </p>
+                <div class="diffusion-laws-box">
+                    Vm = (KT/q) * ln[ (Pk[K]o + Pna[Na]o + Pcl[Cl]i) / (Pk[K]i + Pna[Na]i + Pcl[Cl]o) ]
+                </div>
+                <div class="list-item">
+                    <strong>تعادل دونان (Donnan Equilibrium - اسلاید ۲۵):</strong>
+                    <p>در شرایطی که یون‌های بزرگ (مانند پروتئین‌ها) قابلیت عبور ندارند، تعادل دونان برقرار شده و نسبت غلظت کاتیون‌های یک‌ظرفیتی با معکوس غلظت آنیون‌ها برابر می‌گردد:</p>
+                    <span style="font-family:monospace; font-size:11px; color:var(--secondary);">[K⁺]o / [K⁺]i = [Na⁺]o / [Na⁺]i = [Cl⁻]i / [Cl⁻]o</span>
+                </div>
+                <div class="list-item" style="border-right-color: var(--secondary);">
+                    <strong>دمای محاسبه ماهی آکسون (اسلاید ۲۷):</strong>
+                    <p>داده‌های پیش‌فرض منطبق بر محاسبات آکسون ماهی در دمای 6.3 درجه سانتی‌گراد است که در آن ضریب ثابت ترمودینامیکی KT/q تقریباً برابر با <strong>25.3 میلی‌ولت</strong> می‌باشد.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">۲. مدل مداری غشای سلول (هاجکین-هاکسلی)</div>
+    <div class="grid grid-2col">
+        
+        <div class="card">
+            <h3>برش مداری معادل غشای عصبی (اسلایدهای ۲۸ تا ۳۳)</h3>
+            <p style="font-size:12.5px; color:var(--text-muted); margin-top:0;">
+                روی هر یک از شاخه‌های الکتریکی غشای موازی زیر کلیک کنید تا عملکرد فیزیولوژیکی و معادل مداری آن در مدل هاجکین-هاکسلی را مشاهده نمایید:
+            </p>
+            
+            <div class="hh-circuit-container">
+                <svg class="hh-svg" viewBox="0 0 450 200">
+                    <!-- Top wire (Inside) -->
+                    <line x1="20" y1="20" x2="430" y2="20" stroke="#fff" stroke-width="2"/>
+                    <text x="220" y="15" fill="#fff" font-size="10" text-anchor="middle">داخل سلول (Inside - سیتوپلاسم رسانا)</text>
+                    
+                    <!-- Bottom wire (Outside) -->
+                    <line x1="20" y1="180" x2="430" y2="180" stroke="#fff" stroke-width="2"/>
+                    <text x="220" y="195" fill="#fff" font-size="10" text-anchor="middle">خارج سلول (Outside - الکترولیت رسانا)</text>
+                    
+                    <!-- 1. Membrane Capacitance Branch -->
+                    <g class="interactive-branch" id="branchCm" onclick="selectHhBranch('Cm')">
+                        <line x1="50" y1="20" x2="50" y2="85" stroke="var(--primary)" stroke-width="2"/>
+                        <!-- Capacitor plates -->
+                        <line x1="35" y1="85" x2="65" y2="85" stroke="var(--primary)" stroke-width="3"/>
+                        <line x1="35" y1="95" x2="65" y2="95" stroke="var(--primary)" stroke-width="3"/>
+                        <line x1="50" y1="95" x2="50" y2="180" stroke="var(--primary)" stroke-width="2"/>
+                        <text x="50" y="70" fill="var(--primary)" font-size="11" text-anchor="middle" font-weight="bold">Cm</text>
+                    </g>
+                    
+                    <!-- 2. Sodium Variable Branch -->
+                    <g class="interactive-branch" id="branchNa" onclick="selectHhBranch('Na')">
+                        <line x1="140" y1="20" x2="140" y2="50" stroke="var(--secondary)" stroke-width="2"/>
+                        <!-- Variable resistor -->
+                        <polygon points="135,50 145,55 135,60 145,65 135,70 145,75 140,80" fill="none" stroke="var(--secondary)" stroke-width="2"/>
+                        <!-- Arrow for variable -->
+                        <line x1="125" y1="75" x2="155" y2="55" stroke="var(--secondary)" stroke-width="1.5"/>
+                        <!-- Battery -->
+                        <line x1="140" y1="80" x2="140" y2="110" stroke="var(--secondary)" stroke-width="2"/>
+                        <line x1="130" y1="110" x2="150" y2="110" stroke="var(--secondary)" stroke-width="3"/>
+                        <line x1="135" y1="116" x2="145" y2="116" stroke="var(--secondary)" stroke-width="1.5"/>
+                        <line x1="140" y1="116" x2="140" y2="180" stroke="var(--secondary)" stroke-width="2"/>
+                        <text x="165" y="65" fill="var(--secondary)" font-size="10">gNa</text>
+                        <text x="165" y="118" fill="var(--secondary)" font-size="10">ENa (+/-)</text>
+                    </g>
+
+                    <!-- 3. Potassium Variable Branch -->
+                    <g class="interactive-branch" id="branchK" onclick="selectHhBranch('K')">
+                        <line x1="240" y1="20" x2="240" y2="50" stroke="var(--accent)" stroke-width="2"/>
+                        <!-- Variable resistor -->
+                        <polygon points="235,50 245,55 235,60 245,65 235,70 245,75 240,80" fill="none" stroke="var(--accent)" stroke-width="2"/>
+                        <!-- Arrow for variable -->
+                        <line x1="225" y1="75" x2="255" y2="55" stroke="var(--accent)" stroke-width="1.5"/>
+                        <!-- Battery -->
+                        <line x1="240" y1="80" x2="240" y2="110" stroke="var(--accent)" stroke-width="2"/>
+                        <line x1="230" y1="116" x2="250" y2="116" stroke="var(--accent)" stroke-width="3"/>
+                        <line x1="235" y1="110" x2="245" y2="110" stroke="var(--accent)" stroke-width="1.5"/>
+                        <line x1="240" y1="116" x2="240" y2="180" stroke="var(--accent)" stroke-width="2"/>
+                        <text x="265" y="65" fill="var(--accent)" font-size="10">gK</text>
+                        <text x="265" y="118" fill="var(--accent)" font-size="10">EK (-/+)</text>
+                    </g>
+
+                    <!-- 4. Leakage Branch -->
+                    <g class="interactive-branch" id="branchL" onclick="selectHhBranch('L')">
+                        <line x1="330" y1="20" x2="330" y2="50" stroke="#94a3b8" stroke-width="2"/>
+                        <!-- Fixed Resistor -->
+                        <polygon points="325,50 335,55 325,60 335,65 325,70 335,75 330,80" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                        <!-- Battery -->
+                        <line x1="330" y1="80" x2="330" y2="110" stroke="#94a3b8" stroke-width="2"/>
+                        <line x1="320" y1="110" x2="340" y2="110" stroke="#94a3b8" stroke-width="3"/>
+                        <line x1="325" y1="116" x2="335" y2="116" stroke="#94a3b8" stroke-width="1.5"/>
+                        <line x1="330" y1="116" x2="330" y2="180" stroke="#94a3b8" stroke-width="2"/>
+                        <text x="350" y="65" fill="#94a3b8" font-size="10">gL</text>
+                        <text x="350" y="118" fill="#94a3b8" font-size="10">EL</text>
+                    </g>
+
+                    <!-- 5. Active Pump (Current Sources) -->
+                    <g class="interactive-branch" id="branchPump" onclick="selectHhBranch('Pump')">
+                        <line x1="410" y1="20" x2="410" y2="60" stroke="var(--success)" stroke-width="2"/>
+                        <!-- Circle current source -->
+                        <circle cx="410" cy="80" r="15" fill="none" stroke="var(--success)" stroke-width="2"/>
+                        <line x1="410" y1="70" x2="410" y2="90" stroke="var(--success)" stroke-width="2"/>
+                        <!-- arrow head -->
+                        <polygon points="410,67 406,73 414,73" fill="var(--success)"/>
+                        <line x1="410" y1="95" x2="410" y2="180" stroke="var(--success)" stroke-width="2"/>
+                        <text x="390" y="83" fill="var(--success)" font-size="9" text-anchor="end">پمپ فعال</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h3>تحلیل الکتریکی مدل غشا (اسلایدهای ۲۸ تا ۳۳)</h3>
+                <div class="output-box" id="hhDescriptionBox" style="margin-top:0; min-height:180px;">
+                    <strong style="color:var(--primary); font-size:14px; display:block; margin-bottom:10px;" id="hhTitle">خازن لایه لیپیدی غشا (Cm - اسلاید ۳۱)</strong>
+                    <p style="font-size:12.5px; line-height:1.7; margin:0; color:var(--text-muted);" id="hhText">
+                        خاصیت خازنی به دلیل وجود دو محیط رسانای الکترولیتی (سیتوپلاسم داخل و مایع خارج سلولی) پدید می‌آید که توسط یک لایه چربی عایق (Bilayer) از هم تفکیک شده‌اند. خازن غشا مانع عبور مستقیم یون‌ها شده و جریان بارها را صرفاً به مجراهای مشخص کانالی محدود می‌سازد.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">۳. شبیه‌ساز پتانسیل عمل و قانون همه یا هیچ (All-or-None Law)</div>
+    <div class="grid grid-equal">
+        
+        <div class="card">
+            <h3>تنظیمات اعمال تحریک عصبی</h3>
+            <div class="form-group">
+                <label>شدت جریان تحریک الکتریکی: <span id="stimulusVal" class="output-value">35</span> mA</label>
+                <input type="range" id="stimulusInput" min="10" max="90" value="35" oninput="updateStimulusDisplay()">
+            </div>
+            
+            <div class="btn-group">
+                <button class="action-btn" onclick="triggerActionPotential()">اعمال محرک به سلول عصبی ⚡</button>
+            </div>
+
+            <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">
+                <strong>قانون همه یا هیچ (اسلاید ۱۵):</strong> اگر شدت محرک به حد آستانه (در اینجا ۴۰ میلی‌آمپر) نرسد، پاسخ غشایی به صورت شکست‌خورده ناپدید می‌شود. در صورت عبور از آستانه، یک پتانسیل عمل کامل به اوج می‌رسد و افزایش بیشتر شدت تحریک تغییری در دامنه پتانسیل عمل ایجاد نمی‌کند.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>منحنی ثبت پاسخ ولتاژ غشا بر حسب زمان (ms)</h3>
+            <div class="plot-container">
+                <canvas id="apCanvas" height="190"></canvas>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:8px; margin-bottom:0;">
+                در بازه زمانی دپلاریزاسیون (مطلق) تحریک مجدد غیرممکن است. در بازه هایپرپلاریزاسیون (تحریک‌ناپذیری نسبی - اسلاید ۱۶) تنها با اعمال محرک‌های بسیار قوی‌تر امکان‌پذیر است.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="section-title">۴. انتشار پتانسیل عمل در آکسون (جهشی در برابر مداوم)</div>
+    <div class="grid grid-2col">
+        
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3>تحلیل سرعت انتقال پیام عصبی (اسلایدهای ۳۵ و ۳۶)</h3>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:0;">
+                    انتقال پیام عصبی در حقیقت ایجاد پتانسیل‌های عمل جدید در فواصل مجاور غشاست که بدون کاهش دامنه در طول مسیر انتشار می‌یابد:
+                </p>
+                <div class="list-item">
+                    <strong>هدایت جهشی (Saltatory Conduction - اسلاید ۳۵):</strong>
+                    <p>در فیبرهای عصبی میلین‌دار، غلاف میلین مانند عایق ضخیم عمل کرده و خازن غشا را بسیار کوچک می‌کند. به همین دلیل پتانسیل عمل به صورت جهشی از یک گره رانویه (Node of Ranvier) به گره بعدی منتقل شده و سرعت را تا ۱۰۰ برابر افزایش می‌دهد.</p>
+                </div>
+                <div class="list-item" style="border-right-color: var(--secondary);">
+                    <strong>هدایت مداوم (Continuous - اسلاید ۳۶):</strong>
+                    <p>در آکسون‌های بدون میلین، جریان به صورت پیوسته کل مساحت غشا را دپلاریزه می‌کند که سرعت بسیار پایین‌تر و مصرف انرژی بالاتری دارد.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>شبیه‌ساز زنده انتشار سیگنال حیاتی</h3>
+            <div class="plot-container">
+                <canvas id="conductionCanvas" height="230"></canvas>
+            </div>
+            <div class="btn-group" style="margin-top: 15px; margin-bottom:0;">
+                <button class="action-btn" style="background-color: var(--accent); color: white; border-color: var(--accent);" onclick="startConductionDemo()">شلیک سیگنال به دو آکسون 🚀</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">۵. قوانین فیزیکی انتشار یون‌ها و رفتار الکترودی درمان</div>
+    <div class="grid grid-equal">
+        
+        <div class="card">
+            <h3>قوانین حاکم بر پتانسیل استراحت (اسلاید ۲۱)</h3>
+            
+            <div class="list-item">
+                <strong>قانون گرادیان‌های یونی (قانون نفوذ فیک - Fick's Law):</strong>
+                <p>انتشار به دلیل اختلاف تمرکز مواد از سمت غلیظ به رقیق صورت می‌پذیرد:</p>
+                <div class="diffusion-laws-box">
+                    J_K (diffusion) = -D * d[K⁺]/dx
+                </div>
+            </div>
+
+            <div class="list-item" style="border-right-color: var(--accent);">
+                <strong>قانون میدان الکتریکی (قانون اهم):</strong>
+                <p>رانش ذرات باردار تحت تاثیر پتانسیل الکتریکی غشا:</p>
+                <div class="diffusion-laws-box" style="border-right-color:var(--accent);">
+                    J_K (drift) = -μ * Z * [K⁺] * dv/dx
+                </div>
+                <p style="font-size:11px; margin:0; color:var(--text-muted);">نکته: عدد بار Z برای کاتیون‌ها مثبت و برای آنیون‌ها منفی اعمال می‌شود.</p>
+            </div>
+        </div>
+
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <h3>تحریک و بلوک هدایت عصبی (اسلاید ۳۷)</h3>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:0;">
+                    در فرآیند الکتروتراپی سطحی بر روی پوست، اعمال جریان خارجی می‌تواند به صورت موضعی هدایت سیگنال را مختل یا تحریک کند:
+                </p>
+                
+                <div class="list-item" style="border-right-color: var(--error);">
+                    <strong>الکترود مثبت (آند - Anode):</strong>
+                    <p>ایجاد قطب مثبت در خارج غشا منجر به <strong>هایپرپلاریزاسیون (Hyperpolarised)</strong> پتانسیل غشا شده و از عبور پتانسیل عمل جلوگیری و عصب را مسدود (Block) می‌کند.</p>
+                </div>
+
+                <div class="list-item" style="border-right-color: var(--success);">
+                    <strong>الکترود منفی (کاتد - Cathode):</strong>
+                    <p>کاهش بارهای مثبت خارج غشا عصب را <strong>دپلاریزه (Depolarised)</strong> کرده و شرایط را برای تحریک مجدد و آغاز پتانسیل‌های عمل جدید فراهم می‌آورد.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // --- Nernst & GHK Calculations ---
+    const R_CONST = 8.314;
+    const F_CONST = 96485;
+    let tempC = 6.3; // Axon squid temp (Slide 27)
+    let KT_over_q = 25.3e-3; // 25.3 mV
+
+    function setGhkPreset(preset) {
+        document.getElementById('presetSquidRest').classList.remove('active');
+        document.getElementById('presetSquidPeak').classList.remove('active');
+
+        if (preset === 'squid-rest') {
+            document.getElementById('presetSquidRest').classList.add('active');
+            // Resting values
+            document.getElementById('koInput').value = 20;
+            document.getElementById('pkInput').value = 1.0;
+            document.getElementById('naoInput').value = 440;
+            document.getElementById('pnaInput').value = 0.04;
+            document.getElementById('cloInput').value = 560;
+            document.getElementById('pclInput').value = 0.45;
+        } else {
+            document.getElementById('presetSquidPeak').classList.add('active');
+            // Action potential peak values (Sodium channel highly active)
+            document.getElementById('koInput').value = 20;
+            document.getElementById('pkInput').value = 1.0;
+            document.getElementById('naoInput').value = 440;
+            document.getElementById('pnaInput').value = 15.0; // Pna increases massively
+            document.getElementById('cloInput').value = 560;
+            document.getElementById('pclInput').value = 0.45;
+        }
+        calculateGhk();
+    }
+
+    function calculateGhk() {
+        const ko = parseFloat(document.getElementById('koInput').value);
+        const ki = 400; // Constant as per Slide 27 table
+        const pk = parseFloat(document.getElementById('pkInput').value);
+
+        const nao = parseFloat(document.getElementById('naoInput').value);
+        const nai = 50; // Constant as per Slide 27
+        const pna = parseFloat(document.getElementById('pnaInput').value);
+
+        const clo = parseFloat(document.getElementById('cloInput').value);
+        const cli = 52; // Constant as per Slide 27
+        const pcl = parseFloat(document.getElementById('pclInput').value);
+
+        // Update display text values
+        document.getElementById('koVal').innerText = ko;
+        document.getElementById('pkVal').innerText = pk.toFixed(2);
+        document.getElementById('naoVal').innerText = nao;
+        document.getElementById('pnaVal').innerText = pna.toFixed(2);
+        document.getElementById('cloVal').innerText = clo;
+        document.getElementById('pclVal').innerText = pcl.toFixed(2);
+
+        // Nernst individual calculations
+        const EK = 25.3 * Math.log(ko / ki);
+        const ENa = 25.3 * Math.log(nao / nai);
+        const ECl = -25.3 * Math.log(clo / cli); // anions inverted inside/outside
+
+        document.getElementById('outEK').innerText = (EK >= 0 ? '+' : '') + EK.toFixed(1) + ' mV';
+        document.getElementById('outENa').innerText = (ENa >= 0 ? '+' : '') + ENa.toFixed(1) + ' mV';
+        document.getElementById('outECl').innerText = (ECl >= 0 ? '+' : '') + ECl.toFixed(1) + ' mV';
+
+        // GHK equation calculation
+        const numerator = (pk * ko) + (pna * nao) + (pcl * cli);
+        const denominator = (pk * ki) + (pna * nai) + (pcl * clo);
+        const Vm = 25.3 * Math.log(numerator / denominator);
+
+        document.getElementById('outVm').innerText = (Vm >= 0 ? '+' : '') + Vm.toFixed(1) + ' mV';
+    }
+
+    // --- Hodgkin-Huxley Circuit Interaction ---
+    function selectHhBranch(branch) {
+        document.querySelectorAll('.interactive-branch').forEach(b => b.classList.remove('active'));
+        document.getElementById('branch' + branch).classList.add('active');
+
+        const title = document.getElementById('hhTitle');
+        const desc = document.getElementById('hhText');
+
+        if (branch === 'Cm') {
+            title.innerText = "خازن لایه لیپیدی غشا (Cm - اسلاید ۳۱)";
+            desc.innerText = "خاصیت خازنی به دلیل وجود دو محیط رسانای الکترولیتی (سیتوپلاسم داخل و مایع خارج سلولی) پدید می‌آید که توسط یک لایه چربی عایق (Bilayer) از هم تفکیک شده‌اند. خازن غشا مانع عبور مستقیم یون‌ها شده و جریان بارها را صرفاً به مجراهای مشخص کانالی محدود می‌سازد.";
+        } else if (branch === 'Na') {
+            title.innerText = "شاخه هادی کانال سدیم (gNa & ENa - اسلاید ۳۲)";
+            desc.innerText = "کانال سدیم دارای مقاومت متغیر است (مدل‌سازی با فلش روی مقاومت). در پتانسیل استراحت مسدود بوده، اما به دنبال تحریک باز می‌شود. نیروی باتری آن (ENa) مثبت بوده (+55mV) که تمایل دارد پتانسل داخل سلول را به سمت مثبت هدایت کند (دپلاریزاسیون).";
+        } else if (branch === 'K') {
+            title.innerText = "شاخه هادی کانال پتاسیم (gK & EK - اسلاید ۳۲)";
+            desc.innerText = "کانال پتاسیم به صورت تأخیری باز می‌شود و دارای مقاومت متغیر رسانایی است. باتری آن (EK) تمایل دارد غشا را به سمت ولتاژهای عمیقاً منفی (-75mV) سوق دهد که اساس فرآیند بازگشت به پتانسیل تعادلی (ریپلاریزاسیون) را شکل می‌دهد.";
+        } else if (branch === 'L') {
+            title.innerText = "شاخه نشتی غشا (gL & EL - اسلاید ۳۲)";
+            desc.innerText = "کانال‌های غیرفعال همیشه باز که عمدتاً برای یون‌های کلر و جریان‌های نشتی جزئی هستند. مقاومت این شاخه ثابت بوده و پتانسیل باتری نشتی (EL) همواره متمایل به پتانسیل مبدا استراحت است.";
+        } else if (branch === 'Pump') {
+            title.innerText = "پمپ فعال سدیم-پتاسیم (Active Pump - اسلاید ۳۰)";
+            desc.innerText = "برای حفظ تعادل غلظت یون‌ها در استراحت، پمپ با مصرف انرژی (ATP)، به ازای هر ۳ یون سدیم که خارج می‌کند، ۲ یون پتاسیم وارد می‌نماید. در مدل مداری به صورت دو منبع جریان فعال معکوس شبیه‌سازی می‌شود.";
+        }
+    }
+
+    // --- Action Potential Canvas Simulation ---
+    const apCanvas = document.getElementById('apCanvas');
+    const apCtx = apCanvas.getContext('2d');
+    let apWidth = apCanvas.width;
+    let apHeight = apCanvas.height;
+
+    function resizeApCanvas() {
+        apCanvas.width = apCanvas.parentElement.clientWidth;
+        apWidth = apCanvas.width;
+        apHeight = apCanvas.height;
+        drawApFrame(apPoints, -70);
+    }
+    window.addEventListener('resize', resizeApCanvas);
+
+    let apPoints = [];
+    let isAnimatingAp = false;
+    let animFrameIndex = 0;
+    let finalApData = [];
+
+    function updateStimulusDisplay() {
+        const val = document.getElementById('stimulusInput').value;
+        document.getElementById('stimulusVal').innerText = val;
+    }
+
+    function drawApFrame(points, currentVal) {
+        apCtx.clearRect(0, 0, apWidth, apHeight);
+        apCtx.fillStyle = '#02060d';
+        apCtx.fillRect(0, 0, apWidth, apHeight);
+
+        const marginL = 40;
+        const marginR = 15;
+        const marginT = 15;
+        const marginB = 30;
+        const chartW = apWidth - marginL - marginR;
+        const chartH = apHeight - marginT - marginB;
+
+        // Draw grid
+        apCtx.strokeStyle = '#1e293b';
+        apCtx.lineWidth = 1;
+        for (let v = -90; v <= 50; v += 20) {
+            let y = marginT + chartH - ((v - (-90)) / 140) * chartH;
+            apCtx.beginPath();
+            apCtx.moveTo(marginL, y);
+            apCtx.lineTo(marginL + chartW, y);
+            apCtx.stroke();
+
+            apCtx.fillStyle = '#94a3b8';
+            apCtx.font = '9px Vazirmatn';
+            apCtx.textAlign = 'right';
+            apCtx.fillText(v + ' mV', marginL - 8, y + 3);
+        }
+
+        // Action potential trace
+        if (points.length > 1) {
+            apCtx.strokeStyle = 'var(--primary)';
+            apCtx.lineWidth = 2;
+            apCtx.beginPath();
+            for (let i = 0; i < points.length; i++) {
+                let x = marginL + (i / 100) * chartW;
+                let y = marginT + chartH - ((points[i] - (-90)) / 140) * chartH;
+                if (i === 0) apCtx.moveTo(x, y);
+                else apCtx.lineTo(x, y);
+            }
+            apCtx.stroke();
+        }
+
+        // Draw current pulse indicator
+        apCtx.fillStyle = 'var(--secondary)';
+        apCtx.beginPath();
+        let lastX = marginL + ((points.length - 1) / 100) * chartW;
+        let lastY = marginT + chartH - ((currentVal - (-90)) / 140) * chartH;
+        apCtx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+        apCtx.fill();
+    }
+
+    function generateApTrajectory(stimulus) {
+        let traj = [];
+        // 0-10ms resting
+        for (let i = 0; i < 15; i++) traj.push(-70);
+        
+        if (stimulus < 40) {
+            // Subthreshold (Failed initiation - Slide 15)
+            let maxRise = -70 + (stimulus * 0.25);
+            for (let i = 0; i < 15; i++) {
+                let ratio = i / 14;
+                traj.push(-70 + (maxRise - (-70)) * Math.sin(ratio * Math.PI / 2));
+            }
+            for (let i = 0; i < 40; i++) {
+                let ratio = i / 39;
+                traj.push(maxRise - (maxRise - (-70)) * ratio);
+            }
+            while (traj.length < 100) traj.push(-70);
+        } else {
+            // Action Potential (All-or-None Law - Slide 15)
+            // Depolarization up to +40 mV
+            let peak = 40;
+            for (let i = 0; i < 12; i++) {
+                let ratio = i / 11;
+                traj.push(-70 + (peak - (-70)) * Math.sin(ratio * Math.PI / 2));
+            }
+            // Repolarization down to -80 mV (Hyperpolarization phase)
+            for (let i = 0; i < 18; i++) {
+                let ratio = i / 17;
+                traj.push(peak - (peak - (-80)) * ratio);
+            }
+            // Refractory period recovery back to -70 mV
+            for (let i = 0; i < 35; i++) {
+                let ratio = i / 34;
+                traj.push(-80 + 10 * Math.sin(ratio * Math.PI / 2));
+            }
+            while (traj.length < 100) traj.push(-70);
+        }
+        return traj;
+    }
+
+    function triggerActionPotential() {
+        if (isAnimatingAp) return;
+        const stim = parseFloat(document.getElementById('stimulusInput').value);
+        finalApData = generateApTrajectory(stim);
+        apPoints = [];
+        animFrameIndex = 0;
+        isAnimatingAp = true;
+        animateApStep();
+    }
+
+    function animateApStep() {
+        if (animFrameIndex < finalApData.length) {
+            apPoints.push(finalApData[animFrameIndex]);
+            drawApFrame(apPoints, finalApData[animFrameIndex]);
+            animFrameIndex++;
+            requestAnimationFrame(animateApStep);
+        } else {
+            isAnimatingAp = false;
+        }
+    }
+
+
+    // --- Saltatory vs Continuous Conduction Canvas ---
+    const conductionCanvas = document.getElementById('conductionCanvas');
+    const condCtx = conductionCanvas.getContext('2d');
+    let condWidth = conductionCanvas.width;
+    let condHeight = conductionCanvas.height;
+
+    function resizeConductionCanvas() {
+        conductionCanvas.width = conductionCanvas.parentElement.clientWidth;
+        condWidth = conductionCanvas.width;
+        condHeight = conductionCanvas.height;
+        drawConductionLayout(0, 0);
+    }
+    window.addEventListener('resize', resizeConductionCanvas);
+
+    let signalActive = false;
+    let myelinatedPos = 0;
+    let unmyelinatedPos = 0;
+
+    function drawConductionLayout(mPos, unPos) {
+        condCtx.clearRect(0, 0, condWidth, condHeight);
+        condCtx.fillStyle = '#02060d';
+        condCtx.fillRect(0, 0, condWidth, condHeight);
+
+        const leftMargin = 30;
+        const rightMargin = 30;
+        const lineW = condWidth - leftMargin - rightMargin;
+
+        // 1. Myelinated Axon (هدایت جهشی)
+        condCtx.fillStyle = 'var(--primary)';
+        condCtx.font = '11px Vazirmatn';
+        condCtx.fillText("آکسون میلین‌دار (هدایت جهشی گره‌های رانویه) - سرعت بالا 🚀", leftMargin, 30);
+
+        // Draw myelins (Slide 35)
+        condCtx.strokeStyle = '#334155';
+        condCtx.lineWidth = 14;
+        condCtx.beginPath();
+        condCtx.moveTo(leftMargin, 60);
+        condCtx.lineTo(leftMargin + lineW, 60);
+        condCtx.stroke();
+
+        // draw myelin blocks
+        const nodeInterval = lineW / 5;
+        for (let i = 0; i < 5; i++) {
+            let startX = leftMargin + i * nodeInterval + 5;
+            let width = nodeInterval - 10;
+            condCtx.fillStyle = '#f1c40f'; // yellow myelin
+            condCtx.fillRect(startX, 50, width, 20);
+        }
+
+        // Signal marker (Myelinated hops from node to node)
+        if (signalActive) {
+            let currentNodeIndex = Math.floor((mPos / lineW) * 5);
+            if (currentNodeIndex > 4) currentNodeIndex = 4;
+            let signalX = leftMargin + currentNodeIndex * nodeInterval;
+            
+            condCtx.fillStyle = 'var(--secondary)';
+            condCtx.beginPath();
+            condCtx.arc(signalX, 60, 6, 0, Math.PI * 2);
+            condCtx.fill();
+            condCtx.shadowColor = 'var(--secondary)';
+            condCtx.shadowBlur = 8;
+            condCtx.fill();
+            condCtx.shadowBlur = 0; // reset
+        }
+
+        // 2. Unmyelinated Axon (هدایت مداوم)
+        condCtx.fillStyle = '#94a3b8';
+        condCtx.font = '11px Vazirmatn';
+        condCtx.fillText("آکسون بدون میلین (هدایت مداوم غشایی) - سرعت پایین 🐌", leftMargin, 130);
+
+        // Draw plain axon
+        condCtx.strokeStyle = '#334155';
+        condCtx.lineWidth = 14;
+        condCtx.beginPath();
+        condCtx.moveTo(leftMargin, 160);
+        condCtx.lineTo(leftMargin + lineW, 160);
+        condCtx.stroke();
+
+        // Signal marker (Continuous movement)
+        if (signalActive) {
+            let signalX = leftMargin + unPos;
+            condCtx.fillStyle = 'var(--primary)';
+            condCtx.beginPath();
+            condCtx.arc(signalX, 160, 6, 0, Math.PI * 2);
+            condCtx.fill();
+        }
+    }
+
+    function startConductionDemo() {
+        if (signalActive) return;
+        signalActive = true;
+        myelinatedPos = 0;
+        unmyelinatedPos = 0;
+        animateConduction();
+    }
+
+    function animateConduction() {
+        const lineW = condWidth - 60;
+        
+        // Myelinated velocity is fast
+        myelinatedPos += lineW * 0.05; 
+        // Unmyelinated is slow and continuous
+        unmyelinatedPos += lineW * 0.008;
+
+        drawConductionLayout(myelinatedPos, unmyelinatedPos);
+
+        if (myelinatedPos >= lineW && unmyelinatedPos >= lineW) {
+            signalActive = false;
+            // Draw end frame
+            drawConductionLayout(0, 0);
+        } else {
+            requestAnimationFrame(animateConduction);
+        }
+    }
+
+    window.onload = function() {
+        calculateGhk();
+        resizeApCanvas();
+        resizeConductionCanvas();
+        selectHhBranch('Cm');
+    };
+</script>
+
+</body>
+</html>
