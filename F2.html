@@ -360,7 +360,6 @@
                 <button id="presetSquidPeak" onclick="setGhkPreset('squid-peak')">اوج پتانسیل عمل (Na Active)</button>
             </div>
 
-            <!-- Potassium sliders -->
             <div class="form-group">
                 <label>غلظت پتاسیم داخل [K⁺]i : <span id="kiVal" class="output-value">400</span> mM | خارج [K⁺]o : <span id="koVal" class="output-value">20</span> mM</label>
                 <input type="range" id="koInput" min="2" max="50" value="20" oninput="calculateGhk()">
@@ -370,7 +369,6 @@
                 <input type="range" id="pkInput" min="0" max="1" value="1" step="0.05" oninput="calculateGhk()">
             </div>
 
-            <!-- Sodium sliders -->
             <div class="form-group">
                 <label>غلظت سدیم داخل [Na⁺]i : <span id="naiVal" class="output-value">50</span> mM | خارج [Na⁺]o : <span id="naoVal" class="output-value">440</span> mM</label>
                 <input type="range" id="naoInput" min="50" max="500" value="440" oninput="calculateGhk()">
@@ -380,7 +378,6 @@
                 <input type="range" id="pnaInput" min="0" max="20" value="0.04" step="0.01" oninput="calculateGhk()">
             </div>
 
-            <!-- Chloride sliders -->
             <div class="form-group">
                 <label>غلظت کلر داخل [Cl⁻]i : <span id="cliVal" class="output-value">52</span> mM | خارج [Cl⁻]o : <span id="cloVal" class="output-value">560</span> mM</label>
                 <input type="range" id="cloInput" min="50" max="600" value="560" oninput="calculateGhk()">
@@ -444,32 +441,24 @@
             
             <div class="hh-circuit-container">
                 <svg class="hh-svg" viewBox="0 0 450 200">
-                    <!-- Top wire (Inside) -->
                     <line x1="20" y1="20" x2="430" y2="20" stroke="#fff" stroke-width="2"/>
                     <text x="220" y="15" fill="#fff" font-size="10" text-anchor="middle">داخل سلول (Inside - سیتوپلاسم رسانا)</text>
                     
-                    <!-- Bottom wire (Outside) -->
                     <line x1="20" y1="180" x2="430" y2="180" stroke="#fff" stroke-width="2"/>
                     <text x="220" y="195" fill="#fff" font-size="10" text-anchor="middle">خارج سلول (Outside - الکترولیت رسانا)</text>
                     
-                    <!-- 1. Membrane Capacitance Branch -->
                     <g class="interactive-branch" id="branchCm" onclick="selectHhBranch('Cm')">
                         <line x1="50" y1="20" x2="50" y2="85" stroke="var(--primary)" stroke-width="2"/>
-                        <!-- Capacitor plates -->
                         <line x1="35" y1="85" x2="65" y2="85" stroke="var(--primary)" stroke-width="3"/>
                         <line x1="35" y1="95" x2="65" y2="95" stroke="var(--primary)" stroke-width="3"/>
                         <line x1="50" y1="95" x2="50" y2="180" stroke="var(--primary)" stroke-width="2"/>
                         <text x="50" y="70" fill="var(--primary)" font-size="11" text-anchor="middle" font-weight="bold">Cm</text>
                     </g>
                     
-                    <!-- 2. Sodium Variable Branch -->
                     <g class="interactive-branch" id="branchNa" onclick="selectHhBranch('Na')">
                         <line x1="140" y1="20" x2="140" y2="50" stroke="var(--secondary)" stroke-width="2"/>
-                        <!-- Variable resistor -->
                         <polygon points="135,50 145,55 135,60 145,65 135,70 145,75 140,80" fill="none" stroke="var(--secondary)" stroke-width="2"/>
-                        <!-- Arrow for variable -->
                         <line x1="125" y1="75" x2="155" y2="55" stroke="var(--secondary)" stroke-width="1.5"/>
-                        <!-- Battery -->
                         <line x1="140" y1="80" x2="140" y2="110" stroke="var(--secondary)" stroke-width="2"/>
                         <line x1="130" y1="110" x2="150" y2="110" stroke="var(--secondary)" stroke-width="3"/>
                         <line x1="135" y1="116" x2="145" y2="116" stroke="var(--secondary)" stroke-width="1.5"/>
@@ -478,14 +467,10 @@
                         <text x="165" y="118" fill="var(--secondary)" font-size="10">ENa (+/-)</text>
                     </g>
 
-                    <!-- 3. Potassium Variable Branch -->
                     <g class="interactive-branch" id="branchK" onclick="selectHhBranch('K')">
                         <line x1="240" y1="20" x2="240" y2="50" stroke="var(--accent)" stroke-width="2"/>
-                        <!-- Variable resistor -->
                         <polygon points="235,50 245,55 235,60 245,65 235,70 245,75 240,80" fill="none" stroke="var(--accent)" stroke-width="2"/>
-                        <!-- Arrow for variable -->
                         <line x1="225" y1="75" x2="255" y2="55" stroke="var(--accent)" stroke-width="1.5"/>
-                        <!-- Battery -->
                         <line x1="240" y1="80" x2="240" y2="110" stroke="var(--accent)" stroke-width="2"/>
                         <line x1="230" y1="116" x2="250" y2="116" stroke="var(--accent)" stroke-width="3"/>
                         <line x1="235" y1="110" x2="245" y2="110" stroke="var(--accent)" stroke-width="1.5"/>
@@ -494,12 +479,9 @@
                         <text x="265" y="118" fill="var(--accent)" font-size="10">EK (-/+)</text>
                     </g>
 
-                    <!-- 4. Leakage Branch -->
                     <g class="interactive-branch" id="branchL" onclick="selectHhBranch('L')">
                         <line x1="330" y1="20" x2="330" y2="50" stroke="#94a3b8" stroke-width="2"/>
-                        <!-- Fixed Resistor -->
                         <polygon points="325,50 335,55 325,60 335,65 325,70 335,75 330,80" fill="none" stroke="#94a3b8" stroke-width="2"/>
-                        <!-- Battery -->
                         <line x1="330" y1="80" x2="330" y2="110" stroke="#94a3b8" stroke-width="2"/>
                         <line x1="320" y1="110" x2="340" y2="110" stroke="#94a3b8" stroke-width="3"/>
                         <line x1="325" y1="116" x2="335" y2="116" stroke="#94a3b8" stroke-width="1.5"/>
@@ -508,13 +490,10 @@
                         <text x="350" y="118" fill="#94a3b8" font-size="10">EL</text>
                     </g>
 
-                    <!-- 5. Active Pump (Current Sources) -->
                     <g class="interactive-branch" id="branchPump" onclick="selectHhBranch('Pump')">
                         <line x1="410" y1="20" x2="410" y2="60" stroke="var(--success)" stroke-width="2"/>
-                        <!-- Circle current source -->
                         <circle cx="410" cy="80" r="15" fill="none" stroke="var(--success)" stroke-width="2"/>
                         <line x1="410" y1="70" x2="410" y2="90" stroke="var(--success)" stroke-width="2"/>
-                        <!-- arrow head -->
                         <polygon points="410,67 406,73 414,73" fill="var(--success)"/>
                         <line x1="410" y1="95" x2="410" y2="180" stroke="var(--success)" stroke-width="2"/>
                         <text x="390" y="83" fill="var(--success)" font-size="9" text-anchor="end">پمپ فعال</text>
@@ -648,11 +627,10 @@
 </div>
 
 <script>
-    // --- Nernst & GHK Calculations ---
     const R_CONST = 8.314;
     const F_CONST = 96485;
-    let tempC = 6.3; // Axon squid temp (Slide 27)
-    let KT_over_q = 25.3e-3; // 25.3 mV
+    let tempC = 6.3; 
+    let KT_over_q = 25.3e-3;
 
     function setGhkPreset(preset) {
         document.getElementById('presetSquidRest').classList.remove('active');
@@ -660,7 +638,6 @@
 
         if (preset === 'squid-rest') {
             document.getElementById('presetSquidRest').classList.add('active');
-            // Resting values
             document.getElementById('koInput').value = 20;
             document.getElementById('pkInput').value = 1.0;
             document.getElementById('naoInput').value = 440;
@@ -669,11 +646,10 @@
             document.getElementById('pclInput').value = 0.45;
         } else {
             document.getElementById('presetSquidPeak').classList.add('active');
-            // Action potential peak values (Sodium channel highly active)
             document.getElementById('koInput').value = 20;
             document.getElementById('pkInput').value = 1.0;
             document.getElementById('naoInput').value = 440;
-            document.getElementById('pnaInput').value = 15.0; // Pna increases massively
+            document.getElementById('pnaInput').value = 15.0; 
             document.getElementById('cloInput').value = 560;
             document.getElementById('pclInput').value = 0.45;
         }
@@ -682,18 +658,17 @@
 
     function calculateGhk() {
         const ko = parseFloat(document.getElementById('koInput').value);
-        const ki = 400; // Constant as per Slide 27 table
+        const ki = 400; 
         const pk = parseFloat(document.getElementById('pkInput').value);
 
         const nao = parseFloat(document.getElementById('naoInput').value);
-        const nai = 50; // Constant as per Slide 27
+        const nai = 50; 
         const pna = parseFloat(document.getElementById('pnaInput').value);
 
         const clo = parseFloat(document.getElementById('cloInput').value);
-        const cli = 52; // Constant as per Slide 27
+        const cli = 52; 
         const pcl = parseFloat(document.getElementById('pclInput').value);
 
-        // Update display text values
         document.getElementById('koVal').innerText = ko;
         document.getElementById('pkVal').innerText = pk.toFixed(2);
         document.getElementById('naoVal').innerText = nao;
@@ -701,16 +676,14 @@
         document.getElementById('cloVal').innerText = clo;
         document.getElementById('pclVal').innerText = pcl.toFixed(2);
 
-        // Nernst individual calculations
         const EK = 25.3 * Math.log(ko / ki);
         const ENa = 25.3 * Math.log(nao / nai);
-        const ECl = -25.3 * Math.log(clo / cli); // anions inverted inside/outside
+        const ECl = -25.3 * Math.log(clo / cli);
 
         document.getElementById('outEK').innerText = (EK >= 0 ? '+' : '') + EK.toFixed(1) + ' mV';
         document.getElementById('outENa').innerText = (ENa >= 0 ? '+' : '') + ENa.toFixed(1) + ' mV';
         document.getElementById('outECl').innerText = (ECl >= 0 ? '+' : '') + ECl.toFixed(1) + ' mV';
 
-        // GHK equation calculation
         const numerator = (pk * ko) + (pna * nao) + (pcl * cli);
         const denominator = (pk * ki) + (pna * nai) + (pcl * clo);
         const Vm = 25.3 * Math.log(numerator / denominator);
@@ -718,7 +691,6 @@
         document.getElementById('outVm').innerText = (Vm >= 0 ? '+' : '') + Vm.toFixed(1) + ' mV';
     }
 
-    // --- Hodgkin-Huxley Circuit Interaction ---
     function selectHhBranch(branch) {
         document.querySelectorAll('.interactive-branch').forEach(b => b.classList.remove('active'));
         document.getElementById('branch' + branch).classList.add('active');
@@ -744,7 +716,6 @@
         }
     }
 
-    // --- Action Potential Canvas Simulation ---
     const apCanvas = document.getElementById('apCanvas');
     const apCtx = apCanvas.getContext('2d');
     let apWidth = apCanvas.width;
@@ -780,7 +751,6 @@
         const chartW = apWidth - marginL - marginR;
         const chartH = apHeight - marginT - marginB;
 
-        // Draw grid
         apCtx.strokeStyle = '#1e293b';
         apCtx.lineWidth = 1;
         for (let v = -90; v <= 50; v += 20) {
@@ -796,7 +766,6 @@
             apCtx.fillText(v + ' mV', marginL - 8, y + 3);
         }
 
-        // Action potential trace
         if (points.length > 1) {
             apCtx.strokeStyle = 'var(--primary)';
             apCtx.lineWidth = 2;
@@ -810,7 +779,6 @@
             apCtx.stroke();
         }
 
-        // Draw current pulse indicator
         apCtx.fillStyle = 'var(--secondary)';
         apCtx.beginPath();
         let lastX = marginL + ((points.length - 1) / 100) * chartW;
@@ -821,11 +789,9 @@
 
     function generateApTrajectory(stimulus) {
         let traj = [];
-        // 0-10ms resting
         for (let i = 0; i < 15; i++) traj.push(-70);
         
         if (stimulus < 40) {
-            // Subthreshold (Failed initiation - Slide 15)
             let maxRise = -70 + (stimulus * 0.25);
             for (let i = 0; i < 15; i++) {
                 let ratio = i / 14;
@@ -837,19 +803,16 @@
             }
             while (traj.length < 100) traj.push(-70);
         } else {
-            // Action Potential (All-or-None Law - Slide 15)
-            // Depolarization up to +40 mV
+            
             let peak = 40;
             for (let i = 0; i < 12; i++) {
                 let ratio = i / 11;
                 traj.push(-70 + (peak - (-70)) * Math.sin(ratio * Math.PI / 2));
             }
-            // Repolarization down to -80 mV (Hyperpolarization phase)
             for (let i = 0; i < 18; i++) {
                 let ratio = i / 17;
                 traj.push(peak - (peak - (-80)) * ratio);
             }
-            // Refractory period recovery back to -70 mV
             for (let i = 0; i < 35; i++) {
                 let ratio = i / 34;
                 traj.push(-80 + 10 * Math.sin(ratio * Math.PI / 2));
@@ -881,7 +844,6 @@
     }
 
 
-    // --- Saltatory vs Continuous Conduction Canvas ---
     const conductionCanvas = document.getElementById('conductionCanvas');
     const condCtx = conductionCanvas.getContext('2d');
     let condWidth = conductionCanvas.width;
@@ -908,12 +870,10 @@
         const rightMargin = 30;
         const lineW = condWidth - leftMargin - rightMargin;
 
-        // 1. Myelinated Axon (هدایت جهشی)
         condCtx.fillStyle = 'var(--primary)';
         condCtx.font = '11px Vazirmatn';
         condCtx.fillText("آکسون میلین‌دار (هدایت جهشی گره‌های رانویه) - سرعت بالا 🚀", leftMargin, 30);
 
-        // Draw myelins (Slide 35)
         condCtx.strokeStyle = '#334155';
         condCtx.lineWidth = 14;
         condCtx.beginPath();
@@ -921,16 +881,14 @@
         condCtx.lineTo(leftMargin + lineW, 60);
         condCtx.stroke();
 
-        // draw myelin blocks
         const nodeInterval = lineW / 5;
         for (let i = 0; i < 5; i++) {
             let startX = leftMargin + i * nodeInterval + 5;
             let width = nodeInterval - 10;
-            condCtx.fillStyle = '#f1c40f'; // yellow myelin
+            condCtx.fillStyle = '#f1c40f';
             condCtx.fillRect(startX, 50, width, 20);
         }
 
-        // Signal marker (Myelinated hops from node to node)
         if (signalActive) {
             let currentNodeIndex = Math.floor((mPos / lineW) * 5);
             if (currentNodeIndex > 4) currentNodeIndex = 4;
@@ -943,15 +901,12 @@
             condCtx.shadowColor = 'var(--secondary)';
             condCtx.shadowBlur = 8;
             condCtx.fill();
-            condCtx.shadowBlur = 0; // reset
-        }
+            condCtx.shadowBlur = 0; 
 
-        // 2. Unmyelinated Axon (هدایت مداوم)
         condCtx.fillStyle = '#94a3b8';
         condCtx.font = '11px Vazirmatn';
         condCtx.fillText("آکسون بدون میلین (هدایت مداوم غشایی) - سرعت پایین 🐌", leftMargin, 130);
 
-        // Draw plain axon
         condCtx.strokeStyle = '#334155';
         condCtx.lineWidth = 14;
         condCtx.beginPath();
@@ -959,7 +914,6 @@
         condCtx.lineTo(leftMargin + lineW, 160);
         condCtx.stroke();
 
-        // Signal marker (Continuous movement)
         if (signalActive) {
             let signalX = leftMargin + unPos;
             condCtx.fillStyle = 'var(--primary)';
@@ -980,16 +934,13 @@
     function animateConduction() {
         const lineW = condWidth - 60;
         
-        // Myelinated velocity is fast
         myelinatedPos += lineW * 0.05; 
-        // Unmyelinated is slow and continuous
         unmyelinatedPos += lineW * 0.008;
 
         drawConductionLayout(myelinatedPos, unmyelinatedPos);
 
         if (myelinatedPos >= lineW && unmyelinatedPos >= lineW) {
             signalActive = false;
-            // Draw end frame
             drawConductionLayout(0, 0);
         } else {
             requestAnimationFrame(animateConduction);
