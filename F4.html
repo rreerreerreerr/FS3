@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شبیه‌ساز الکترودهای زیستی - plexus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap');
+
+        :root {
+            --bg-color: #080b11;
+            --card-bg: #121622;
+            --primary: #00d2d3;
+            --secondary: #ff9f43;
+            --accent: #3498db;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --success: #2ecc71;
+            --error: #e74c3c;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            direction: rtl;
+            text-align: right;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            background-color: rgba(18, 22, 34, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(0, 210, 211, 0.3);
+            line-height: 1.2;
+            text-decoration: none;
+        }
+
+        .back-btn {
+            background-color: rgba(0, 210, 211, 0.1);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #121622 0%, #171d2c 100%);
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hero h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .hero-meta {
+            display: inline-block;
+            background-color: rgba(255, 159, 67, 0.1);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 900;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--primary);
+            padding-right: 12px;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 900px) {
+            .grid-2col {
+                grid-template-columns: 1.2fr 1fr;
+            }
+            .grid-3col {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .grid-equal {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+
+        .card h3 {
+            color: var(--primary);
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            outline: none;
+            accent-color: var(--primary);
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #080b11;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+        }
+
+        .formula-box {
+            background-color: #080b11;
+            border-right: 4px solid var(--secondary);
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--secondary);
+            margin: 15px 0;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .equation-display {
+            font-size: 16px;
+            color: #fff;
+            text-align: center;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .output-box {
+            background-color: rgba(0, 210, 211, 0.05);
+            border: 1px dashed var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .output-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .output-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .output-value {
+            font-weight: bold;
+            color: var(--secondary);
+            font-family: monospace;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: #1e293b;
+            color: #fff;
+            border: 1px solid #334155;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            border-color: var(--primary);
+            background-color: rgba(0, 210, 211, 0.1);
+        }
+
+        button.active {
+            background-color: var(--primary);
+            color: var(--bg-color);
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+
+        button.action-btn {
+            background-color: var(--secondary);
+            color: var(--bg-color);
+            border-color: var(--secondary);
+            font-weight: bold;
+            width: 100%;
+        }
+
+        button.action-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 12px rgba(255, 159, 67, 0.3);
+        }
+
+        .plot-container {
+            background-color: #02060d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background-color: #02060d;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--primary);
+            font-weight: 700;
+            background-color: rgba(0, 210, 211, 0.05);
+        }
+
+        tr.interactive-row {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        tr.interactive-row:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        tr.interactive-row.selected {
+            background-color: rgba(255, 159, 67, 0.1);
+            border-left: 3px solid var(--secondary);
+        }
+
+        .badge-dec {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: var(--error);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .badge-inc {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: var(--success);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .tab-menu {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 15px;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tab-item:hover {
+            color: #fff;
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .list-item {
+            background-color: #171d2c;
+            padding: 12px;
+            border-radius: 8px;
+            border-right: 4px solid var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .list-item strong {
+            display: block;
+            color: var(--secondary);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .list-item p {
+            font-size: 11.5px;
+            margin: 0;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .artifact-display {
+            height: 160px;
+            border: 1px solid var(--border-color);
+            background-color: #02060d;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .interface-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 15px;
+        }
+
+        .diagram-layer {
+            padding: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: opacity 0.2s, transform 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .diagram-layer:hover {
+            transform: scale(1.02);
+        }
+
+        .layer-electrode { background-color: #2ecc71; color: #000; }
+        .layer-gel { background-color: #3498db; color: #fff; }
+        .layer-corneum { background-color: #e67e22; color: #fff; }
+        .layer-dermis { background-color: #f1c40f; color: #000; }
+
+        .diagram-layer.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.4);
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <a href="index.html" class="logo">plexus</a>
+        <a href="index.html" class="back-btn">← بازگشت به پورتال</a>
+    </div>
+</header>
+
+<div class="container">
+    
+    <section class="hero">
+        <div class="hero-meta">فصل چهارم: الکترودهای زیستی</div>
+        <h2>شبیه‌ساز و مرجع بیوالکتریک واسط الکترود-الکترولیت</h2>
+        <p style="margin: 15px auto 0 auto; color: var(--text-muted); font-size: 13px; line-height: 1.8;">
+            این پایگاه علمی و محاسباتی بر اساس مبانی نظری و مسائل امتحانی تدریس شده توسط <strong>استاد عابدزاده</strong> با تمرکز بر عملکرد الکترودهای ثبت و تحریک طراحی شده است.
+        </p>
+    </section>
+
+    <div class="section-title">۱. واسط الکترود-الکترولیت و پتانسیل نیم‌پیل (Nernst Equation)</div>
+    <div class="grid grid-2col">
+        
+        <div class="card">
+            <h3>تنظیمات محلول و الکترود</h3>
+            
+            <div class="form-group">
+                <label for="metalSelect">انتخاب فلز الکترود (واکنش نیم‌پیل):</label>
+                <select id="metalSelect" onchange="calculateNernst()">
+                    <option value="Al" data-e0="-1.706" data-n="3" data-sign="1">Al &rarr; Al³⁺ + 3e⁻ (E⁰ = -1.706 V)</option>
+                    <option value="Zn" data-e0="-0.763" data-n="2" data-sign="1">Zn &rarr; Zn²⁺ + 2e⁻ (E⁰ = -0.763 V)</option>
+                    <option value="Cr" data-e0="-0.744" data-n="3" data-sign="1">Cr &rarr; Cr³⁺ + 3e⁻ (E⁰ = -0.744 V)</option>
+                    <option value="Fe" data-e0="-0.409" data-n="2" data-sign="1">Fe &rarr; Fe²⁺ + 2e⁻ (E⁰ = -0.409 V)</option>
+                    <option value="Cd" data-e0="-0.401" data-n="2" data-sign="1">Cd &rarr; Cd²⁺ + 2e⁻ (E⁰ = -0.401 V)</option>
+                    <option value="Ni" data-e0="-0.230" data-n="2" data-sign="1">Ni &rarr; Ni²⁺ + 2e⁻ (E⁰ = -0.230 V)</option>
+                    <option value="Pb" data-e0="-0.126" data-n="2" data-sign="1">Pb &rarr; Pb²⁺ + 2e⁻ (E⁰ = -0.126 V)</option>
+                    <option value="H2" data-e0="0.000" data-n="1" data-sign="1">H₂ &rarr; 2H⁺ + 2e⁻ (E⁰ = 0.000 V)</option>
+                    <option value="AgCl" data-e0="0.223" data-n="1" data-sign="-1" selected>Ag + Cl⁻ &rarr; AgCl + e⁻ (E⁰ = +0.223 V)</option>
+                    <option value="Cu" data-e0="0.340" data-n="2" data-sign="1">Cu &rarr; Cu²⁺ + 2e⁻ (E⁰ = +0.340 V)</option>
+                    <option value="Ag" data-e0="0.799" data-n="1" data-sign="1">Ag &rarr; Ag⁺ + e⁻ (E⁰ = +0.799 V)</option>
+                    <option value="Au" data-e0="1.420" data-n="3" data-sign="1">Au &rarr; Au³⁺ + 3e⁻ (E⁰ = +1.420 V)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tempInput">دما (درجه سانتی‌گراد): <span id="tempVal" class="output-value">25</span> °C</label>
+                <input type="range" id="tempInput" min="0" max="100" value="25" step="1" oninput="calculateNernst()">
+            </div>
+
+            <div class="form-group">
+                <label for="activityInput">فعالیت یونی آنیون/کاتیون در محلول (a): <span id="activityVal" class="output-value">1.000</span> mol/L</label>
+                <input type="range" id="activityInput" min="0.001" max="2.000" value="1.000" step="0.001" oninput="calculateNernst()">
+            </div>
+
+            <div class="equation-display" id="equationText">
+                E = E⁰ - (RT / nF) ln(a_Cl⁻)
+            </div>
+
+            <div class="output-box">
+                <div class="output-row">
+                    <span>پتانسیل استاندارد (E⁰):</span>
+                    <span id="outE0" class="output-value">+0.223 V</span>
+                </div>
+                <div class="output-row">
+                    <span>ثابت دمایی (RT/F):</span>
+                    <span id="outRTF" class="output-value">0.0257 V</span>
+                </div>
+                <div class="output-row">
+                    <span>پتانسیل نهایی نیم‌پیل محاسباتی (E):</span>
+                    <span id="outE" class="output-value" style="color:var(--primary); font-size:16px;">+0.223 V</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h3>پتانسیل نیم‌پیل چیست؟</h3>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:0;">
+                    پتانسیل نیم‌پیل، اختلاف پتانسیل الکتریکی ایجاد شده در واسط بین الکترود فلزی و الکترولیت است. مطابق اسلاید ۳، این پتانسیل به شرایطی همچون فلز مورد استفاده، غلظت یون‌های موجود در محلول، دما و پارامترهای غیرخطی دیگر بستگی دارد.
+                </p>
+                <div class="list-item">
+                    <strong>فراپتانسیل (Overpotential):</strong>
+                    <p>پتانسیل نیم‌پیل مربوط به شرایط بدون جریان است. اگر جریانی بین الکترود و الکترولیت برقرار شود، پتانسیل تغییر می‌کند. تفاوت بین این دو پتانسیل، فراپتانسیل نام دارد.</p>
+                </div>
+                <div class="list-item" style="border-right-color: var(--secondary);">
+                    <strong>رفع اثر تداخل پتانسیل نیم‌پیل در ثبت:</strong>
+                    <p>پتانسیل نیم‌پیل به تنهایی ثبت سیگنال‌های زیستی بسیار ضعیف را مختل می‌کند. طبق اسلاید ۵، برای حل این مشکل از الکترودهای کاملاً همسان به همراه تقویت‌کننده‌های تفاضلی استفاده می‌شود تا پتانسیل نیم‌پیل مشترک ناخواسته حذف گردد.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">۲. شبیه‌ساز مدل الکتریکی واسط الکترود-الکترولیت</div>
+    <div class="grid grid-2col">
+        
+        <div class="card">
+            <h3>تنظیمات قطعات مدار معادل</h3>
+            <div class="btn-group">
+                <button id="presetPolarizable" class="active" onclick="setPreset('polarizable')">الکترود قابل پلاریزه (خازنی)</button>
+                <button id="presetNonPolarizable" onclick="setPreset('non-polarizable')">الکترود غیرقابل پلاریزه (Ag/AgCl مقاومتی)</button>
+            </div>
+
+            <div class="form-group">
+                <label for="rsInput">مقاومت الکترولیت (R_s): <span id="rsVal" class="output-value">250</span> &Omega;</label>
+                <input type="range" id="rsInput" min="50" max="2000" value="250" step="10" oninput="updateElectricalModel()">
+            </div>
+
+            <div class="form-group">
+                <label for="rdInput">مقاومت نشتی واسط (R_d): <span id="rdVal" class="output-value">29.5</span> k&Omega;</label>
+                <input type="range" id="rdInput" min="1000" max="50000" value="29500" step="500" oninput="updateElectricalModel()">
+            </div>
+
+            <div class="form-group">
+                <label for="cdInput">ظرفیت خازنی دو لایه (C_d): <span id="cdVal" class="output-value">100</span> nF</label>
+                <input type="range" id="cdInput" min="1" max="1000" value="100" step="5" oninput="updateElectricalModel()">
+            </div>
+
+            <div class="output-box">
+                <div class="output-row">
+                    <span>فرکانس گوشه (Corner Frequency):</span>
+                    <span id="outFc" class="output-value">54.0 Hz</span>
+                </div>
+                <div class="output-row">
+                    <span>امپدانس در فرکانس پایین (DC):</span>
+                    <span id="outZlow" class="output-value">29.75 k&Omega;</span>
+                </div>
+                <div class="output-row">
+                    <span>امپدانس در فرکانس بسیار بالا (HF):</span>
+                    <span id="outZhigh" class="output-value">250 &Omega;</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>منحنی پاسخ فرکانسی امپدانس واسط (|Z| vs Freq)</h3>
+            <div class="plot-container">
+                <canvas id="bodeCanvas" height="230"></canvas>
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 10px; margin-bottom: 0;">
+                نمودار امپدانس بر حسب فرکانس (مقیاس لگاریتمی). طبق اسلاید ۱۰، امپدانس الکترود در فرکانس‌های پایین با مقاومت کل R_d + R_s و در فرکانس‌های بالا با R_s تعیین می‌شود.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="section-title">۳. آرتیفکت حرکتی (Motion Artifact) و پارامترهای فیزیکی</div>
+    <div class="grid grid-equal">
+        
+        <div class="card">
+            <h3>شبیه‌ساز و ثبت آرتیفکت حرکتی</h3>
+            <div class="artifact-display">
+                <canvas id="artifactCanvas" height="160"></canvas>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn" onclick="triggerMotionArtifact()">ایجاد جابه‌جایی و شوک حرکتی به الکترود ⚡</button>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin:0;">
+                <strong>اثر آرتیفکت حرکتی (اسلاید ۱۴):</strong> وقتی موقعیت الکترود نسبت به الکترولیت جابه‌جا شود، لایه تفکیک بار (خازن مرزی) مختل شده و نوسان شدیدی در سیگنال ثبت‌شده ایجاد می‌شود. این پدیده در الکترودهای قابل پلاریزه به شدت بزرگ بوده و در الکترودهای غیرقابل پلاریزه (مقاومتی مانند Ag/AgCl) حداقل است.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>تأثیر مشخصات فیزیکی بر امپدانس الکترود</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:0;">
+                بر اساس اسلاید ۱۳ جزوه، تغییر در ویژگی‌های فیزیکی الکترودها تأثیر مستقیمی بر امپدانس کلی آن‌ها دارد. روی هر ردیف کلیک کنید تا جزئیات تغییرات و دلایل علمی آن را مشاهده نمایید:
+            </p>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>مشخصه فیزیکی الکترود</th>
+                            <th>تغییر مشخصه</th>
+                            <th>تغییر امپدانس</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="interactive-row selected" onclick="selectPhysicalProp('size', this)">
+                            <td>اندازه سطح الکترود (Surface Area)</td>
+                            <td>افزایشی</td>
+                            <td><span class="badge-dec">کاهشی</span></td>
+                        </tr>
+                        <tr class="interactive-row" onclick="selectPhysicalProp('polar', this)">
+                            <td>قابلیت پلاریزه شدن (Polarizability)</td>
+                            <td>افزایشی</td>
+                            <td><span class="badge-inc">افزایشی (در فرکانس پایین)</span></td>
+                        </tr>
+                        <tr class="interactive-row" onclick="selectPhysicalProp('roughness', this)">
+                            <td>میزان زبری سطح تماس (Roughness)</td>
+                            <td>افزایشی</td>
+                            <td><span class="badge-dec">کاهشی</span></td>
+                        </tr>
+                        <tr class="interactive-row" onclick="selectPhysicalProp('curvature', this)">
+                            <td>شعاع انحنای الکترود (Curvature Radius)</td>
+                            <td>افزایشی</td>
+                            <td><span class="badge-dec">کاهشی</span></td>
+                        </tr>
+                        <tr class="interactive-row" onclick="selectPhysicalProp('dirty', this)">
+                            <td>میزان آلودگی سطح الکترود (Contamination)</td>
+                            <td>افزایشی</td>
+                            <td><span class="badge-inc">افزایشی</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="result-box" id="physicalDetailBox" style="margin-top: 15px; border-right: 4px solid var(--secondary); background: #171d2c; padding: 12px; font-size: 12.5px; border-radius: 4px;">
+                <strong>تحلیل علمی:</strong> با افزایش سطح مقطع الکترود، ظرفیت خازنی دو لایه (Cd) افزایش یافته و مقاومت مسیر کاهش می‌یابد که در کل منجر به کاهش امپدانس در تمام فرکانس‌ها خواهد شد.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">۴. واسط پوست و الکترود (Electrode-Skin Interface)</div>
+    <div class="grid grid-equal">
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h3>تحلیل لایه‌های واسط بافت و حسگر</h3>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:0;">
+                    مطابق شکل اسلاید ۱۵، در ثبت‌های غیرتهاجمی سطحی، یک واسط چند لایه پیچیده بین فلز الکترود و لایه‌های عمیق بافت زنده شکل می‌گیرد. روی لایه‌های فیزیکی سمت چپ کلیک کنید تا عملکرد معادل الکتریکی آن لایه در مدار ثبت نمایان شود:
+                </p>
+                <div class="output-box" id="skinInterfaceDesc">
+                    <strong style="color:var(--primary); font-size:13px; display:block; margin-bottom:5px;" id="skinLayerTitle">مجموعه فلز الکترود و ژل رسانا</strong>
+                    <span style="font-size:12px; line-height:1.6;" id="skinLayerText">این بخش معادل پتانسیل نیم‌پیل (Ehc)، امپدانس مرز الکترود-الکترولیت (موازی Cd و Rd) و مقاومت سری الکترولیت ژل (Rs) است.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>ساختار لایه‌ها (Slide 15)</h3>
+            <div class="interface-diagram">
+                <div class="diagram-layer layer-electrode active" onclick="highlightSkinLayer('electrode', this)">الکترود فلزی (Metal Electrode) &rarr; Ehc , Cd || Rd</div>
+                <div class="diagram-layer layer-gel" onclick="highlightSkinLayer('gel', this)">ژل هادی رسانا (Electrolyte Gel) &rarr; Rs</div>
+                <div class="diagram-layer layer-corneum" onclick="highlightSkinLayer('corneum', this)">پوست شاخی اپیدرم (Stratum Corneum) &rarr; Ese , Ce || Re</div>
+                <div class="diagram-layer layer-dermis" onclick="highlightSkinLayer('dermis', this)">درم و بافت زیرین (Dermis / Subcutaneous) &rarr; Ru</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">۵. اطلس فنی انواع الکترودهای زیستی (Slides 16-22)</div>
+    <div class="card">
+        <div class="tab-menu">
+            <div class="tab-item active" onclick="switchTab('tabSurface')">الکترودهای سطحی (Surface)</div>
+            <div class="tab-item" onclick="switchTab('tabInternal')">الکترودهای داخلی (Internal)</div>
+            <div class="tab-item" onclick="switchTab('tabMicro')">میکروالکترودها (Microelectrodes)</div>
+        </div>
+
+        <div id="tabSurface" class="tab-content active">
+            <div class="grid grid-3col" style="gap: 15px; margin-bottom: 0;">
+                <div class="list-item" style="margin-bottom:0;">
+                    <strong>الکترودهای صفحه فلزی (Metal-Plate)</strong>
+                    <p>انواع دیسکی یا استوانه‌ای فلزی که با کمک ژل هادی روی پوست چسبانده می‌شوند. نمونه بارز آن الکترودهای ثبت لیدهای دست و پای ECG و دیسک‌های Ag/AgCl در ثبت EEG است.</p>
+                </div>
+                <div class="list-item" style="margin-bottom:0; border-right-color: var(--secondary);">
+                    <strong>الکترودهای مکشی (Suction)</strong>
+                    <p>بدون نیاز به چسب، با مکش مکانیکی محفظه لاستیکی، روی سطح سینه محکم می‌شوند. استفاده عمده آن‌ها در ثبت‌های سریع کلینیکی لیدهای سینه‌ای ECG (پری‌کوردیال) است.</p>
+                </div>
+                <div class="list-item" style="margin-bottom:0; border-right-color: var(--accent);">
+                    <strong>الکترودهای شناور (Floating) و منعطف</strong>
+                    <p>در نوع شناور، دیسک فلزی مستقیماً با پوست برخورد ندارد و در حفره ژل شناور است تا آرتیفکت حرکتی حذف شود. انواع منعطف نیز با لاستیک‌های رسانا روی بافت‌های ناهموار منطبق می‌شوند.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabInternal" class="tab-content">
+            <div class="grid grid-equal" style="gap: 15px; margin-bottom: 0;">
+                <div class="list-item" style="margin-bottom:0;">
+                    <strong>الکترودهای سوزنی (Needle Electrodes)</strong>
+                    <p>برای نفوذ به بافت و ثبت مستقیم پتانسیل‌های عضلانی (EMG). این الکترودها تهاجمی بوده و برای ثبت‌های موضعی دقیق با حداقل امپدانس بافتی اپیدرم به کار می‌روند.</p>
+                </div>
+                <div class="list-item" style="margin-bottom:0; border-right-color: var(--secondary);">
+                    <strong>الکترودهای سیم ظریف و پیچشی (Fine Wire)</strong>
+                    <p>سیم‌های عایق شده بسیار نازک که با سوزن وارد بافت ماهیچه شده و پس از خارج کردن سوزن، در محل خود به صورت قلاب باقی می‌مانند تا حین حرکت بیمار جابه‌جا نشوند.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabMicro" class="tab-content">
+            <div class="grid grid-equal" style="gap: 15px; margin-bottom: 0;">
+                <div class="list-item" style="margin-bottom:0;">
+                    <strong>میکروالکترودهای شیشه‌ای (Metal inside glass)</strong>
+                    <p>یک پیپت شیشه‌ای نازک که با یک محلول الکترولیت رسانا پر شده و یک هسته فلزی داخل آن قرار دارد. قطر نوک آن‌ها کمتر از ۱ میکرون است و برای ثبت‌های داخل سلولی استفاده می‌شوند.</p>
+                </div>
+                <div class="list-item" style="margin-bottom:0; border-right-color: var(--secondary);">
+                    <strong>میکروالکترودهای فلزی عایق‌دار (Glass inside metal)</strong>
+                    <p>یک سیم فلزی بسیار تیز که تمام بدنه آن با شیشه یا یک لایه نازک پلاستیک عایق شده و فقط نوک بسیار ریز آن برای تماس با داخل یا خارج غشای سلول باز نگه داشته شده است.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const R_CONST = 8.314;
+    const F_CONST = 96485;
+
+    function calculateNernst() {
+        const metalSelect = document.getElementById('metalSelect');
+        const selectedOpt = metalSelect.options[metalSelect.selectedIndex];
+        
+        const E0 = parseFloat(selectedOpt.getAttribute('data-e0'));
+        const n = parseInt(selectedOpt.getAttribute('data-n'));
+        const sign = parseInt(selectedOpt.getAttribute('data-sign'));
+        
+        const tempC = parseFloat(document.getElementById('tempInput').value);
+        const activity = parseFloat(document.getElementById('activityInput').value);
+        
+        document.getElementById('tempVal').innerText = tempC;
+        document.getElementById('activityVal').innerText = activity.toFixed(3);
+        
+        const T_kelvin = tempC + 273.15;
+        const RT_over_F = (R_CONST * T_kelvin) / F_CONST;
+        
+        let E = E0 + sign * (RT_over_F / n) * Math.log(activity);
+        
+        document.getElementById('outE0').innerText = (E0 >= 0 ? '+' : '') + E0.toFixed(3) + ' V';
+        document.getElementById('outRTF').innerText = RT_over_F.toFixed(4) + ' V';
+        document.getElementById('outE').innerText = (E >= 0 ? '+' : '') + E.toFixed(4) + ' V';
+        
+        const eqText = document.getElementById('equationText');
+        if (selectedOpt.value === 'AgCl') {
+            eqText.innerText = "E = E⁰ - (RT / F) ln(a_Cl⁻)";
+        } else {
+            const sym = (sign > 0) ? '+' : '-';
+            eqText.innerText = `E = E⁰ ${sym} (RT / ${n}F) ln(a_${selectedOpt.value})`;
+        }
+    }
+
+    const bodeCanvas = document.getElementById('bodeCanvas');
+    const bodeCtx = bodeCanvas.getContext('2d');
+    
+    function initCanvasWidth() {
+        bodeCanvas.width = bodeCanvas.parentElement.clientWidth;
+        updateElectricalModel();
+    }
+    window.addEventListener('resize', initCanvasWidth);
+
+    function setPreset(type) {
+        document.getElementById('presetPolarizable').classList.remove('active');
+        document.getElementById('presetNonPolarizable').classList.remove('active');
+        
+        if (type === 'polarizable') {
+            document.getElementById('presetPolarizable').classList.add('active');
+            document.getElementById('rsInput').value = 400;
+            document.getElementById('rdInput').value = 40000;
+            document.getElementById('cdInput').value = 500;
+        } else {
+            document.getElementById('presetNonPolarizable').classList.add('active');
+            document.getElementById('rsInput').value = 250;
+            document.getElementById('rdInput').value = 14750;
+            document.getElementById('cdInput').value = 100;
+        }
+        updateElectricalModel();
+    }
+
+    function updateElectricalModel() {
+        const Rs = parseFloat(document.getElementById('rsInput').value);
+        const Rd = parseFloat(document.getElementById('rdInput').value);
+        const Cd_nF = parseFloat(document.getElementById('cdInput').value);
+        const Cd = Cd_nF * 1e-9;
+
+        document.getElementById('rsVal').innerText = Rs;
+        document.getElementById('rdVal').innerText = (Rd / 1000).toFixed(1);
+        document.getElementById('cdVal').innerText = Cd_nF;
+
+        const fc = 1 / (2 * Math.PI * Rd * Cd);
+        document.getElementById('outFc').innerText = fc.toFixed(1) + ' Hz';
+        
+        const zLow = Rd + Rs;
+        document.getElementById('outZlow').innerText = (zLow / 1000).toFixed(2) + ' k\u2126';
+        document.getElementById('outZhigh').innerText = Rs + ' \u2126';
+
+        drawBodePlot(Rs, Rd, Cd, fc);
+    }
+
+    function drawBodePlot(Rs, Rd, Cd, fc) {
+        const w = bodeCanvas.width;
+        const h = bodeCanvas.height;
+        bodeCtx.clearRect(0, 0, w, h);
+
+        bodeCtx.fillStyle = '#02060d';
+        bodeCtx.fillRect(0, 0, w, h);
+
+        const marginL = 50;
+        const marginR = 20;
+        const marginT = 20;
+        const marginB = 35;
+        const chartW = w - marginL - marginR;
+        const chartH = h - marginT - marginB;
+
+        bodeCtx.strokeStyle = '#1e293b';
+        bodeCtx.lineWidth = 1;
+        
+        for (let i = 0; i <= 5; i++) {
+            let x = marginL + (i / 5) * chartW;
+            bodeCtx.beginPath();
+            bodeCtx.moveTo(x, marginT);
+            bodeCtx.lineTo(x, marginT + chartH);
+            bodeCtx.stroke();
+
+            let f_label = Math.pow(10, i);
+            let text = f_label >= 1000 ? (f_label/1000) + 'k' : f_label;
+            bodeCtx.fillStyle = '#94a3b8';
+            bodeCtx.font = '10px Vazirmatn';
+            bodeCtx.textAlign = 'center';
+            bodeCtx.fillText(text + 'Hz', x, marginT + chartH + 18);
+        }
+
+        const zMinLog = Math.log10(50);
+        const zMaxLog = Math.log10(100000);
+
+        for (let i = 2; i <= 5; i++) {
+            let zVal = Math.pow(10, i);
+            let y_log = Math.log10(zVal);
+            let y = marginT + chartH - ((y_log - zMinLog) / (zMaxLog - zMinLog)) * chartH;
+            
+            bodeCtx.beginPath();
+            bodeCtx.moveTo(marginL, y);
+            bodeCtx.lineTo(marginL + chartW, y);
+            bodeCtx.stroke();
+
+            bodeCtx.fillStyle = '#94a3b8';
+            bodeCtx.font = '10px Vazirmatn';
+            bodeCtx.textAlign = 'right';
+            let t_label = zVal >= 1000 ? (zVal/1000) + 'k' : zVal;
+            bodeCtx.fillText(t_label + '\u2126', marginL - 8, y + 4);
+        }
+
+        bodeCtx.strokeStyle = 'rgba(0, 210, 211, 0.2)';
+        bodeCtx.lineWidth = 1.5;
+        let x_fc = marginL + (Math.log10(fc) / 5) * chartW;
+        if (x_fc >= marginL && x_fc <= marginL + chartW) {
+            bodeCtx.beginPath();
+            bodeCtx.setLineDash([4, 4]);
+            bodeCtx.moveTo(x_fc, marginT);
+            bodeCtx.lineTo(x_fc, marginT + chartH);
+            bodeCtx.stroke();
+            bodeCtx.setLineDash([]);
+            
+            bodeCtx.fillStyle = 'var(--primary)';
+            bodeCtx.font = '9px Vazirmatn';
+            bodeCtx.textAlign = 'left';
+            bodeCtx.fillText('fc=' + fc.toFixed(0) + 'Hz', x_fc + 4, marginT + 12);
+        }
+
+        bodeCtx.strokeStyle = 'var(--secondary)';
+        bodeCtx.lineWidth = 2.5;
+        bodeCtx.beginPath();
+
+        let first = true;
+        for (let px = 0; px <= chartW; px++) {
+            let logF = (px / chartW) * 5;
+            let f = Math.pow(10, logF);
+            let omega = 2 * Math.PI * f;
+
+            let num = Math.pow(Rs + Rd, 2) + omega * omega * Rd * Rd * Cd * Cd * Rs * Rs;
+            let den = 1 + omega * omega * Rd * Rd * Cd * Cd;
+            let zMag = Math.sqrt(num / den);
+
+            let zMagLog = Math.log10(zMag);
+            let py = marginT + chartH - ((zMagLog - zMinLog) / (zMaxLog - zMinLog)) * chartH;
+
+            if (py >= marginT && py <= marginT + chartH) {
+                if (first) {
+                    bodeCtx.moveTo(marginL + px, py);
+                    first = false;
+                } else {
+                    bodeCtx.lineTo(marginL + px, py);
+                }
+            }
+        }
+        bodeCtx.stroke();
+    }
+
+    const artifactCanvas = document.getElementById('artifactCanvas');
+    const artCtx = artifactCanvas.getContext('2d');
+    let artWidth = artifactCanvas.width;
+    let artHeight = artifactCanvas.height;
+
+    function resizeArtifactCanvas() {
+        artifactCanvas.width = artifactCanvas.parentElement.clientWidth;
+        artWidth = artifactCanvas.width;
+        artHeight = artifactCanvas.height;
+    }
+    window.addEventListener('resize', resizeArtifactCanvas);
+
+    let wavePoints = [];
+    let timeStep = 0;
+    let artifactOffset = 0;
+    let artifactRecovery = 0.98;
+
+    for (let i = 0; i < 200; i++) {
+        wavePoints.push(0);
+    }
+
+    function triggerMotionArtifact() {
+        const isPolar = document.getElementById('presetPolarizable').classList.contains('active');
+        if (isPolar) {
+            artifactOffset = 65;
+            artifactRecovery = 0.985;
+        } else {
+            artifactOffset = 10;
+            artifactRecovery = 0.85;
+        }
+    }
+
+    function animateWave() {
+        timeStep++;
+        
+        let normalSignal = 0;
+        let cycle = timeStep % 50;
+        if (cycle > 10 && cycle < 14) {
+            normalSignal = 20;
+        } else if (cycle >= 14 && cycle < 18) {
+            normalSignal = -35;
+        } else if (cycle >= 18 && cycle < 21) {
+            normalSignal = 50;
+        } else if (cycle >= 21 && cycle < 25) {
+            normalSignal = -15;
+        } else if (cycle >= 28 && cycle < 34) {
+            normalSignal = 12;
+        }
+
+        artifactOffset *= artifactRecovery;
+        if (Math.abs(artifactOffset) < 0.1) artifactOffset = 0;
+
+        let motionNoise = 0;
+        if (Math.abs(artifactOffset) > 0.5) {
+            motionNoise = (Math.random() - 0.5) * (artifactOffset * 0.25);
+        }
+
+        let totalSignal = normalSignal + artifactOffset + motionNoise;
+
+        wavePoints.push(totalSignal);
+        if (wavePoints.length > 300) {
+            wavePoints.shift();
+        }
+
+        artCtx.fillStyle = '#02060d';
+        artCtx.fillRect(0, 0, artWidth, artHeight);
+
+        artCtx.strokeStyle = '#334155';
+        artCtx.lineWidth = 1;
+        artCtx.beginPath();
+        artCtx.moveTo(0, artHeight / 2);
+        artCtx.lineTo(artWidth, artHeight / 2);
+        artCtx.stroke();
+
+        artCtx.strokeStyle = 'var(--primary)';
+        artCtx.lineWidth = 1.8;
+        artCtx.beginPath();
+
+        for (let i = 0; i < wavePoints.length; i++) {
+            let x = (i / (wavePoints.length - 1)) * artWidth;
+            let y = (artHeight / 2) - wavePoints[i];
+            if (i === 0) {
+                artCtx.moveTo(x, y);
+            } else {
+                artCtx.lineTo(x, y);
+            }
+        }
+        artCtx.stroke();
+
+        requestAnimationFrame(animateWave);
+    }
+
+    function selectPhysicalProp(prop, elem) {
+        document.querySelectorAll('.interactive-row').forEach(r => r.classList.remove('selected'));
+        elem.classList.add('selected');
+        
+        const detailBox = document.getElementById('physicalDetailBox');
+        if (prop === 'size') {
+            detailBox.innerHTML = `<strong>تحلیل علمی مساحت (Slide 13):</strong> افزایش مساحت فلز مستقیماً ظرفیت خازنی دو لایه (Cd) را بالا برده و مقاومت مسیر را کاهش می‌دهد. در نتیجه امپدانس کلی واسط به ویژه در فرکانس‌های کاری پایین به شدت افت خواهد کرد.`;
+        } else if (prop === 'polar') {
+            detailBox.innerHTML = `<strong>تحلیل علمی قابلیت پلاریزاسیون (Slide 13):</strong> افزایش خاصیت پلاریزه شدن سبب رفتار خازنی بیشتر الکترود می‌شود. خازن در فرکانس‌های پایین مانند سد عمل می‌کند و امپدانس ورودی سیستم را بالا می‌برد.`;
+        } else if (prop === 'roughness') {
+            detailBox.innerHTML = `<strong>تحلیل علمی زبری سطح (Slide 13):</strong> زبری سطح باعث افزایش مساحت موثر میکروسکوپی تماس الکترود با الکترولیت بدون بزرگ شدن ابعاد ظاهری آن می‌شود. این رخداد مقدار ظرفیت خازنی را بالا برده و امپدانس واسط را کاهش می‌دهد.`;
+        } else if (prop === 'curvature') {
+            detailBox.innerHTML = `<strong>تحلیل علمی شعاع انحنا (Slide 13):</strong> افزایش شعاع انحنای هندسی الکترود سبب بهبود نحوه قرارگیری و توزیع یکنواخت جریان در مرز پوست شده و برآیند امپدانس اتصالی را تعدیل (کاهش) می‌کند.`;
+        } else if (prop === 'dirty') {
+            detailBox.innerHTML = `<strong>تحلیل علمی آلودگی سطح (Slide 13):</strong> آلودگی‌های سطحی یا لایه‌های چربی با ایجاد یک سد دی‌الکتریک ضخیم و نارسانا مانع عبور آزاد یون‌ها می‌شوند. این پدیده مقاومت موازی را بالا برده و امپدانس مسیر عبور جریان را به شدت افزایش می‌دهد.`;
+        }
+    }
+
+    function highlightSkinLayer(layer, elem) {
+        document.querySelectorAll('.diagram-layer').forEach(d => d.classList.remove('active'));
+        elem.classList.add('active');
+
+        const title = document.getElementById('skinLayerTitle');
+        const desc = document.getElementById('skinLayerText');
+
+        if (layer === 'electrode') {
+            title.innerText = "الکترود فلزی (Metal Electrode)";
+            desc.innerText = "مرز اتصال فلز به الکترولیت. مدل الکتریکی شامل پتانسیل نیم‌پیل (Ehc)، مقاومت عبوری نشتی (Rd) و ظرفیت خازنی دو لایه الکتریکی (Cd) به موازات هم است.";
+        } else if (layer === 'gel') {
+            title.innerText = "ژل هادی رسانا (Electrolyte Gel)";
+            desc.innerText = "محیط واسط انتقال یون‌ها بین فلز و پوست. این بخش به صورت یک مقاومت الکترولیت کاملاً خالص سری (Rs) مدل‌سازی می‌شود.";
+        } else if (layer === 'corneum') {
+            title.innerText = "پوست شاخی اپیدرم (Stratum Corneum)";
+            desc.innerText = "لایه سلول‌های مرده پوست که به عنوان یک دی‌الکتریک ضعیف عمل می‌کند. مدل معادل آن شامل پتانسیل پمپ اسمزی (Ese)، ظرفیت خازنی اپیدرم (Ce) موازی با مقاومت اپیدرم (Re) به علاوه مقاومت‌های شانت غدد عرق (Cp و Rp) است.";
+        } else if (layer === 'dermis') {
+            title.innerText = "درم و بافت زیرین (Dermis / Subcutaneous)";
+            desc.innerText = "بخش زیرین حاوی مویرگ‌ها و انتهای رشته‌های عصبی که کاملاً رسانا است و به صورت یک مقاومت سری ساده فاقد اثر خازنی (Ru) در مدار معادل نهایی ثبت شبیه‌سازی می‌گردد.";
+        }
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    window.onload = function() {
+        calculateNernst();
+        resizeArtifactCanvas();
+        initCanvasWidth();
+        animateWave();
+    };
+</script>
+
+</body>
+</html>
